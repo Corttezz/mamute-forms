@@ -315,6 +315,9 @@ export function FormPlayer({ form }: FormPlayerProps) {
           style={{ 
             backgroundColor: `${theme.primaryColor}20`,
           }}
+          indicatorStyle={{
+            backgroundColor: theme.primaryColor,
+          }}
         />
       </div>
 
