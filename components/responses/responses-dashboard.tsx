@@ -66,23 +66,32 @@ function formatDate(date: string) {
 interface FileUpload {
   name: string
   type: string
-  size: number
-  data: string
+  size?: number
+  data?: string  // base64 data URL (fallback)
+  url?: string   // R2 URL (preferred)
 }
 
 function isFileUpload(answer: Json): boolean {
+  if (answer === null || typeof answer !== 'object' || Array.isArray(answer)) {
+    return false
+  }
+  const obj = answer as Record<string, unknown>
+  // Check if it has name and either url or data (file upload signature)
   return (
-    answer !== null &&
-    typeof answer === 'object' &&
-    !Array.isArray(answer) &&
-    'name' in answer &&
-    'data' in answer &&
-    typeof (answer as Record<string, unknown>).data === 'string'
+    'name' in obj &&
+    typeof obj.name === 'string' &&
+    (('url' in obj && typeof obj.url === 'string') || 
+     ('data' in obj && typeof obj.data === 'string'))
   )
 }
 
 function asFileUpload(answer: Json): FileUpload {
   return answer as unknown as FileUpload
+}
+
+function getFileUrl(file: FileUpload): string {
+  // Prefer URL (R2) over data (base64)
+  return file.url || file.data || ''
 }
 
 function formatAnswer(answer: Json): string {
@@ -420,20 +429,20 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
               <span className="truncate">{filePreview?.name}</span>
             </DialogTitle>
             <DialogDescription>
-              {filePreview && formatFileSize(filePreview.size)} • {filePreview?.type}
+              {filePreview?.size ? formatFileSize(filePreview.size) + ' • ' : ''}{filePreview?.type}
             </DialogDescription>
           </DialogHeader>
           
           <div className="flex-1 overflow-auto min-h-0 mt-4">
             {filePreview?.type?.startsWith('image/') ? (
               <img 
-                src={filePreview.data} 
+                src={getFileUrl(filePreview)} 
                 alt={filePreview.name}
                 className="max-w-full h-auto rounded-lg mx-auto"
               />
             ) : filePreview?.type === 'application/pdf' ? (
               <iframe
-                src={filePreview.data}
+                src={getFileUrl(filePreview)}
                 className="w-full h-[60vh] rounded-lg border"
                 title={filePreview.name}
               />
@@ -449,19 +458,28 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
             <Button variant="outline" onClick={() => setFilePreview(null)}>
               Close
             </Button>
-            <Button
-              onClick={() => {
-                if (filePreview) {
-                  const link = document.createElement('a')
-                  link.href = filePreview.data
-                  link.download = filePreview.name
-                  link.click()
-                }
-              }}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download
-            </Button>
+            {filePreview?.url ? (
+              <a href={filePreview.url} target="_blank" rel="noopener noreferrer" download={filePreview.name}>
+                <Button>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+              </a>
+            ) : (
+              <Button
+                onClick={() => {
+                  if (filePreview?.data) {
+                    const link = document.createElement('a')
+                    link.href = filePreview.data
+                    link.download = filePreview.name
+                    link.click()
+                  }
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
