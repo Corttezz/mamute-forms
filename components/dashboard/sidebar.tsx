@@ -39,7 +39,7 @@ export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const initials = user.email?.slice(0, 2).toUpperCase() || 'JD'
-  const avatarUrl = user.user_metadata?.avatar_url
+  const avatarUrl = user.user_metadata?.avatar_url || undefined
   const fullName = user.user_metadata?.full_name || 'John Doe'
   const email = user.email || 'john@example.com'
 
