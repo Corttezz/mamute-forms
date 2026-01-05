@@ -65,7 +65,7 @@ export function FormCard({ form, responseCount }: FormCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-0.5 bg-white/80 backdrop-blur-sm border-slate-200/60">
+    <Card className="overflow-hidden hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-0.5 bg-white/80 backdrop-blur-sm border-slate-200/60">
       {/* Color accent bar */}
       <div className={`h-1 bg-gradient-to-r ${getStatusColor(form.status)}`} />
       <div className="p-6">
@@ -73,7 +73,7 @@ export function FormCard({ form, responseCount }: FormCardProps) {
         <div className="flex-1 min-w-0">
           <Link 
             href={`/forms/${form.id}/edit`}
-            className="text-lg font-semibold text-slate-900 hover:text-blue-600 truncate block transition-colors"
+            className="text-lg font-semibold text-slate-900 hover:text-primary truncate block transition-colors"
           >
             {form.title || 'Untitled Form'}
           </Link>
@@ -131,7 +131,7 @@ export function FormCard({ form, responseCount }: FormCardProps) {
 
       <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
         <Link href={`/forms/${form.id}/edit`} className="flex-1">
-          <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors">
+          <Button variant="outline" size="sm" className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-colors">
             <Pencil className="w-3 h-3 mr-2" />
             Edit
           </Button>

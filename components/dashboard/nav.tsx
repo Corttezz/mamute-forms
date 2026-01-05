@@ -13,7 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { User } from '@supabase/supabase-js'
+// Mock User type
+type User = {
+  id: string
+  email?: string
+  user_metadata?: {
+    full_name?: string
+    avatar_url?: string | null
+  }
+}
 import { LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -26,13 +34,9 @@ export function DashboardNav({ user }: DashboardNavProps) {
   const supabase = createClient()
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      toast.error('Failed to sign out')
-    } else {
-      router.push('/')
-      router.refresh()
-    }
+    // Mock sign out - just redirect
+    router.push('/')
+    router.refresh()
   }
 
   const initials = user.email?.slice(0, 2).toUpperCase() || 'U'
@@ -55,7 +59,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
 
         <div className="flex items-center gap-4">
           <Link href="/forms/new">
-            <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-600/30 hover:-translate-y-0.5">
+            <Button className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-primary/30 hover:-translate-y-0.5">
               Create Form
             </Button>
           </Link>
@@ -65,7 +69,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={avatarUrl} alt={user.email || 'User'} />
-                  <AvatarFallback className="bg-blue-600 text-white font-medium">
+                  <AvatarFallback className="bg-primary text-white font-medium">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

@@ -1,82 +1,402 @@
+'use client'
+
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Card } from '@/components/ui/card'
-import { Plus, FileText } from 'lucide-react'
-import { Form } from '@/lib/database.types'
-import { FormCard } from '@/components/dashboard/form-card'
+import { Plus, Search, Filter, ArrowUpDown, MoreVertical, List, Grid, FileText, BookOpen, Play } from 'lucide-react'
+import { Form, FormStatus } from '@/lib/database.types'
+import { useRouter } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
+// Mock data for demonstration
+const mockForms: Form[] = [
+  {
+    id: '1',
+    user_id: 'mock-user-id',
+    title: 'Customer Feedback Survey',
+    description: null,
+    slug: 'customer-feedback-survey',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-15T14:58:00').toISOString(),
+  },
+  {
+    id: '2',
+    user_id: 'mock-user-id',
+    title: 'Product Registration Form',
+    description: null,
+    slug: 'product-registration',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-14T09:12:00').toISOString(),
+  },
+  {
+    id: '3',
+    user_id: 'mock-user-id',
+    title: 'Event RSVP Form',
+    description: null,
+    slug: 'event-rsvp',
+    status: 'draft',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-17T16:22:00').toISOString(),
+  },
+  {
+    id: '4',
+    user_id: 'mock-user-id',
+    title: 'Newsletter Subscription',
+    description: null,
+    slug: 'newsletter-subscription',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-16T11:45:00').toISOString(),
+  },
+  {
+    id: '5',
+    user_id: 'mock-user-id',
+    title: 'Contact Us Form',
+    description: null,
+    slug: 'contact-us',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-17T13:18:00').toISOString(),
+  },
+  {
+    id: '6',
+    user_id: 'mock-user-id',
+    title: 'Job Application Form',
+    description: null,
+    slug: 'job-application',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-16T15:55:00').toISOString(),
+  },
+  {
+    id: '7',
+    user_id: 'mock-user-id',
+    title: 'Support Ticket Form',
+    description: null,
+    slug: 'support-ticket',
+    status: 'draft',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-17T10:30:00').toISOString(),
+  },
+  {
+    id: '8',
+    user_id: 'mock-user-id',
+    title: 'Website Feedback Form',
+    description: null,
+    slug: 'website-feedback',
+    status: 'published',
+    theme: 'minimal',
+    questions: [],
+    thank_you_message: 'Thank you!',
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date('2024-12-17T17:40:00').toISOString(),
+  },
+]
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+const mockResponseCounts: Record<string, { total: number; today: number }> = {
+  '1': { total: 247, today: 12 },
+  '2': { total: 1432, today: 45 },
+  '3': { total: 0, today: 0 },
+  '4': { total: 3892, today: 127 },
+  '5': { total: 89, today: 5 },
+  '6': { total: 156, today: 8 },
+  '7': { total: 0, today: 0 },
+  '8': { total: 34, today: 3 },
+}
+
+function formatDate(date: string) {
+  const d = new Date(date)
+  const month = d.toLocaleString('en-US', { month: 'short' })
+  const day = d.getDate()
+  const year = d.getFullYear()
+  const hour = d.getHours()
+  const minute = d.getMinutes()
+  const ampm = hour >= 12 ? 'PM' : 'AM'
+  const hour12 = hour % 12 || 12
+  const minuteStr = minute.toString().padStart(2, '0')
+  return `${month} ${day}, ${year} ${hour12}:${minuteStr} ${ampm}`
+}
+
+function getTimeAgo(date: string) {
+  const now = new Date()
+  const formDate = new Date(date)
+  const diffInDays = Math.floor((now.getTime() - formDate.getTime()) / (1000 * 60 * 60 * 24))
   
-  const { data: formsData } = await supabase
-    .from('forms')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('updated_at', { ascending: false })
+  if (diffInDays === 0) return 'Created today'
+  if (diffInDays === 1) return 'Created yesterday'
+  if (diffInDays < 7) return `Created ${diffInDays} days ago`
+  if (diffInDays < 14) return 'Created 1 week ago'
+  if (diffInDays < 30) return `Created ${Math.floor(diffInDays / 7)} weeks ago`
+  if (diffInDays < 60) return 'Created 1 month ago'
+  return `Created ${Math.floor(diffInDays / 30)} months ago`
+}
 
-  const forms = (formsData || []) as Form[]
+function getStatusBadge(status: FormStatus) {
+  switch (status) {
+    case 'published':
+      return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">Published</Badge>
+    case 'draft':
+      return <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-0">Draft</Badge>
+    case 'closed':
+      return <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-0">Closed</Badge>
+  }
+}
 
-  // Get response counts for each form
-  const formIds = forms.map(f => f.id)
-  const { data: responseCounts } = formIds.length > 0 
-    ? await supabase
-        .from('responses')
-        .select('form_id')
-        .in('form_id', formIds)
-    : { data: [] }
+export default function DashboardPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const router = useRouter()
 
-  const responseCountMap = new Map<string, number>()
-  responseCounts?.forEach((r: { form_id: string }) => {
-    const count = responseCountMap.get(r.form_id) || 0
-    responseCountMap.set(r.form_id, count + 1)
-  })
+  const filteredForms = useMemo(() => {
+    if (!searchQuery) return mockForms
+    return mockForms.filter(form =>
+      form.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [searchQuery])
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Forms</h1>
-          <p className="text-slate-600 mt-1">Create and manage your forms</p>
-        </div>
-        <Link href="/forms/new">
-          <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all hover:shadow-blue-600/30 hover:-translate-y-0.5">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Form
-          </Button>
-        </Link>
-      </div>
-
-      {forms.length === 0 ? (
-        <Card className="p-16 text-center border-dashed border-2 border-blue-200/60 bg-gradient-to-br from-white via-blue-50/30 to-sky-50/30">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-100 to-sky-100 flex items-center justify-center shadow-lg shadow-blue-500/10">
-            <FileText className="w-10 h-10 text-blue-500" />
+    <div className="p-8">
+      <div className="w-full">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <h1 className="text-[24px] font-semibold text-slate-900 mb-1" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                Forms
+              </h1>
+              <p className="text-[14px] text-slate-600" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                Create and manage your your forms
+              </p>
+            </div>
+            <Link href="/forms/new">
+              <Button className="bg-[#111827] hover:bg-[#111827]/90 text-white h-10 text-[14px] font-medium" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create form
+              </Button>
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-3">Create your first form</h2>
-          <p className="text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
-            Build beautiful, engaging forms that people actually want to fill out. One question at a time.
-          </p>
-          <Link href="/forms/new">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hover:shadow-blue-600/35 hover:-translate-y-0.5">
-              <Plus className="w-5 h-5 mr-2" />
-              Create your first form
-            </Button>
-          </Link>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {forms.map((form) => (
-            <FormCard 
-              key={form.id} 
-              form={form} 
-              responseCount={responseCountMap.get(form.id) || 0} 
-            />
-          ))}
         </div>
-      )}
+
+        {/* Search and Filter Bar */}
+        <div className="bg-white border-t border-b border-slate-200 -mx-8 px-8 mb-6">
+          <div className="w-full py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="w-[300px] relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  placeholder="Search forms..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-10 text-[14px] border-slate-200 shadow-none"
+                  style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
+                />
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm" className="h-10 text-[14px] border-slate-200 bg-white" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
+                </Button>
+                
+                <Button variant="outline" size="sm" className="h-10 text-[14px] border-slate-200 bg-white" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  Sort
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    className={`h-10 w-10 p-0 ${viewMode === 'list' ? 'bg-[#111827] text-white' : 'bg-white border-slate-200'}`}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    className={`h-10 w-10 p-0 ${viewMode === 'grid' ? 'bg-[#111827] text-white' : 'bg-white border-slate-200'}`}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Card */}
+        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+          {/* Forms Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Form name
+                  </th>
+                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Status
+                  </th>
+                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Responses
+                  </th>
+                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Last updated
+                  </th>
+                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-right" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredForms.map((form, index) => {
+                  const responseData = mockResponseCounts[form.id] || { total: 0, today: 0 }
+                  return (
+                    <tr 
+                      key={form.id} 
+                      className={`border-b border-slate-200 hover:bg-slate-50 transition-colors ${index === filteredForms.length - 1 ? 'border-b-0' : ''}`}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${form.status === 'published' ? 'bg-[#111827]' : 'bg-slate-500'}`}>
+                            <FileText className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <Link
+                              href={`/forms/${form.id}/edit`}
+                              className="text-[14px] font-medium text-slate-900 hover:text-[#111827] transition-colors block"
+                              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
+                            >
+                              {form.title}
+                            </Link>
+                            <p className="text-[12px] text-slate-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                              {getTimeAgo(form.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(form.status)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {form.status === 'published' ? (
+                          <div className="flex flex-col">
+                            <span className="text-[14px] text-slate-900" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                              {responseData.total.toLocaleString('en-US').replace(/,/g, '.')}
+                            </span>
+                            {responseData.today > 0 && (
+                              <span className="text-[12px] text-emerald-600 mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                                (+{responseData.today} today)
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[14px] text-slate-400" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                            Not published
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[14px] text-slate-600" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                          {formatDate(form.updated_at)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/forms/${form.id}/edit`} className="cursor-pointer">
+                                  Edit
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <Link href={`/forms/${form.id}/responses`} className="cursor-pointer">
+                                  View responses
+                                </Link>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Help Section */}
+          <div className="px-6 py-6 bg-[#000000]">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="text-[18px] font-semibold text-white mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                  Need help getting started?
+                </h3>
+                <p className="text-[14px] text-white/80 mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                  Check out our comprehensive guides and tutorials to make the most of MamuteForms.
+                </p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    className="h-9 bg-white text-[#000000] hover:bg-white/90 text-[14px] border-0"
+                    style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    View Documentation
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-9 bg-[#000000] text-white hover:bg-[#000000]/90 text-[14px] border border-white/20"
+                    style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Watch Tutorials
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

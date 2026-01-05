@@ -10,29 +10,29 @@ interface LogoProps {
 }
 
 export function Logo({ href = '/', size = 'md', className }: LogoProps) {
-  const sizes = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl',
-  }
-
   const content = (
     <span
       className={cn(
-        sizes[size],
-        'font-bold tracking-tight text-blue-600',
-        'hover:text-blue-500 transition-colors',
+        'text-[24px] font-bold leading-[100%] tracking-[0%]',
+        'transition-colors',
         className
       )}
+      style={{
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: 700,
+        fontSize: '24px',
+        lineHeight: '100%',
+        letterSpacing: '0%',
+        color: '#000000',
+      }}
     >
-      Open
-      <span className="font-extrabold text-slate-900">Form</span>
+      MamuteForms
     </span>
   )
 
   if (href) {
     return (
-      <Link href={href} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">
+      <Link href={href} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
         {content}
       </Link>
     )

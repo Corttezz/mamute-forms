@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/card'
 
@@ -13,8 +12,15 @@ export default async function SettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
+  // Use mock user if no user
+  const mockUser = user || {
+    id: 'mock-user-id',
+    email: 'user@example.com',
+    user_metadata: {
+      full_name: 'Mock User',
+      avatar_url: null,
+    },
+    created_at: new Date().toISOString(),
   }
 
   return (
@@ -41,7 +47,7 @@ export default async function SettingsPage() {
             <Input 
               id="email" 
               type="email" 
-              value={user.email || ''} 
+              value={mockUser.email || ''} 
               disabled 
               className="mt-2 bg-gray-50"
             />
@@ -50,12 +56,12 @@ export default async function SettingsPage() {
             </p>
           </div>
 
-          {user.user_metadata?.full_name && (
+          {mockUser.user_metadata?.full_name && (
             <div>
               <Label htmlFor="name">Name</Label>
               <Input 
                 id="name" 
-                value={user.user_metadata.full_name} 
+                value={mockUser.user_metadata.full_name} 
                 disabled 
                 className="mt-2 bg-gray-50"
               />
@@ -67,7 +73,7 @@ export default async function SettingsPage() {
       <Card className="p-6 mt-6">
         <h2 className="text-lg font-semibold mb-2">Account created</h2>
         <p className="text-gray-600">
-          {new Date(user.created_at).toLocaleDateString('en-US', {
+          {new Date(mockUser.created_at).toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
             year: 'numeric',

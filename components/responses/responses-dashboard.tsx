@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Form, Response, QuestionConfig, Json } from '@/lib/database.types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -116,7 +115,6 @@ function formatFileSize(bytes: number): string {
 
 export function ResponsesDashboard({ form, responses: initialResponses }: ResponsesDashboardProps) {
   const router = useRouter()
-  const supabase = createClient()
   const questions = (form.questions as QuestionConfig[]) || []
 
   const [responses, setResponses] = useState(initialResponses)
@@ -143,20 +141,14 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
     if (!responseToDelete) return
     
     setIsDeleting(true)
-    const { error } = await supabase
-      .from('responses')
-      .delete()
-      .eq('id', responseToDelete)
-
-    if (error) {
-      toast.error('Failed to delete response')
-    } else {
+    // Mock delete - just update local state
+    setTimeout(() => {
       setResponses(prev => prev.filter(r => r.id !== responseToDelete))
       toast.success('Response deleted')
-    }
-    setIsDeleting(false)
-    setDeleteDialogOpen(false)
-    setResponseToDelete(null)
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+      setResponseToDelete(null)
+    }, 500)
   }
 
   const exportToCSV = () => {
@@ -273,7 +265,7 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
             }
           </p>
           {form.status === 'published' && (
-            <Button onClick={copyFormLink} className="mt-6 bg-blue-600 hover:bg-blue-700">
+            <Button onClick={copyFormLink} className="mt-6 bg-primary hover:bg-primary/90">
               <Copy className="w-4 h-4 mr-2" />
               Copy form link
             </Button>
@@ -334,7 +326,7 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
                               <TableCell key={question.id} className="max-w-[300px]">
                                 <button
                                   onClick={() => setFilePreview(file)}
-                                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors text-sm group"
+                                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-sm group"
                                 >
                                   {isImage ? (
                                     <ImageIcon className="w-4 h-4" />
@@ -422,9 +414,9 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {filePreview?.type?.startsWith('image/') ? (
-                <ImageIcon className="w-5 h-5 text-blue-600" />
+                <ImageIcon className="w-5 h-5 text-primary" />
               ) : (
-                <File className="w-5 h-5 text-blue-600" />
+                <File className="w-5 h-5 text-primary" />
               )}
               <span className="truncate">{filePreview?.name}</span>
             </DialogTitle>
@@ -460,14 +452,14 @@ export function ResponsesDashboard({ form, responses: initialResponses }: Respon
             </Button>
             {filePreview?.url ? (
               <a href={filePreview.url} target="_blank" rel="noopener noreferrer" download={filePreview.name}>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-primary hover:bg-primary/90">
                   <Download className="w-4 h-4 mr-2" />
                   Download
                 </Button>
               </a>
             ) : (
               <Button
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary/90"
                 onClick={() => {
                   if (filePreview?.data) {
                     const link = document.createElement('a')

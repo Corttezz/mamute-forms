@@ -160,7 +160,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
   const currentTheme = themes[form.theme as ThemePreset] || themes.minimal
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Header */}
       <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-4">
@@ -178,7 +178,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                 setForm({ ...form, title: e.target.value })
                 setHasUnsavedChanges(true)
               }}
-              className="text-lg font-semibold border-0 border-b-2 border-transparent bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-blue-500 hover:border-slate-300 px-1 pr-7 max-w-xs transition-colors"
+              className="text-lg font-semibold border-0 border-b-2 border-transparent bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-primary hover:border-slate-300 px-1 pr-7 max-w-xs transition-colors"
               placeholder="Untitled Form"
             />
             <Pencil className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-0 transition-opacity pointer-events-none" />
@@ -226,7 +226,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
             onClick={() => setShowPublishDialog(true)}
             className={form.status === 'published' 
               ? 'bg-amber-500 hover:bg-amber-600' 
-              : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20'
+              : 'bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20'
             }
           >
             <Globe className="w-4 h-4 mr-2" />
@@ -261,7 +261,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               <div className="shrink-0 p-4 border-b border-slate-100">
                 <Button 
                   onClick={() => setShowAddQuestion(true)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20"
+                  className="w-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Question
@@ -289,7 +289,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                               className={`
                                 group p-3 rounded-lg cursor-pointer mb-2 border transition-all
                                 ${selectedQuestionId === question.id 
-                                  ? 'bg-blue-50 border-blue-200' 
+                                  ? 'bg-primary/10 border-primary/20' 
                                   : 'bg-white border-slate-100 hover:border-slate-200'
                                 }
                               `}
@@ -352,7 +352,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                         className={`
                           p-3 rounded-lg border-2 transition-all text-left
                           ${form.theme === theme.id 
-                            ? 'border-blue-500 ring-2 ring-blue-200' 
+                            ? 'border-primary ring-2 ring-primary/20' 
                             : 'border-slate-200 hover:border-slate-300'
                           }
                         `}
@@ -493,9 +493,9 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               <button
                 key={qt.type}
                 onClick={() => addQuestion(qt.type)}
-                className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all text-left group"
+                className="p-4 rounded-lg border border-slate-200 hover:border-primary/30 hover:bg-primary/10 transition-all text-left group"
               >
-                <qt.icon className="w-6 h-6 text-slate-400 group-hover:text-blue-600 mb-2" />
+                <qt.icon className="w-6 h-6 text-slate-400 group-hover:text-primary mb-2" />
                 <p className="font-medium text-sm text-slate-900">{qt.label}</p>
                 <p className="text-xs text-slate-500 mt-1">{qt.description}</p>
               </button>
@@ -520,7 +520,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
           </DialogHeader>
           {form.status !== 'published' && (
             <div className="p-3 bg-slate-50 rounded-lg">
-              <code className="text-sm text-blue-600">
+              <code className="text-sm text-primary">
                 {typeof window !== 'undefined' ? window.location.origin : ''}/f/{form.slug}
               </code>
             </div>
@@ -534,7 +534,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               disabled={isSaving}
               className={form.status === 'published' 
                 ? 'bg-amber-500 hover:bg-amber-600' 
-                : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20'
+                : 'bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20'
               }
             >
               {isSaving ? 'Saving...' : form.status === 'published' ? 'Unpublish' : 'Publish'}

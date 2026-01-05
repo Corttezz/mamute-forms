@@ -39,7 +39,7 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
     <div className="p-4 space-y-6">
       {/* Question Type Badge */}
       <div className="flex items-center gap-2">
-        {typeInfo && <typeInfo.icon className="w-4 h-4 text-blue-600" />}
+        {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
         <span className="text-sm font-medium text-slate-600">{typeInfo?.label}</span>
       </div>
 

@@ -9,7 +9,7 @@ export default function FormNotFound() {
       <div 
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.08) 0%, transparent 50%), linear-gradient(to bottom, #f8faff 0%, #ffffff 100%)",
+          background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(17, 24, 39, 0.05) 0%, transparent 50%), linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)",
         }}
       />
       <div className="text-center max-w-md relative z-10">
@@ -21,7 +21,7 @@ export default function FormNotFound() {
           This form doesn&apos;t exist or is no longer available.
         </p>
         <Link href="/">
-          <Button className="bg-blue-600 hover:bg-blue-700">Go to homepage</Button>
+          <Button className="bg-primary hover:bg-primary/90">Go to homepage</Button>
         </Link>
       </div>
     </div>
