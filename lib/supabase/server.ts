@@ -237,7 +237,7 @@ export async function createClient() {
               return Promise.resolve(result)
             },
           }
-        },
+    },
       }
     },
   } as any

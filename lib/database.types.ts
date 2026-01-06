@@ -44,6 +44,16 @@ export interface ThemeConfig {
   fontFamily: string
 }
 
+// Question style configuration
+export interface QuestionStyle {
+  theme?: ThemePreset
+  fontFamily?: string
+  textColor?: string
+  buttonBackgroundColor?: string
+  buttonTextColor?: string
+  verticalAlignment?: 'center' | 'left'
+}
+
 // Question configuration
 export interface QuestionConfig {
   id: string
@@ -58,6 +68,8 @@ export interface QuestionConfig {
   allowedFileTypes?: string[] // For file_upload
   maxFileSize?: number // In MB
   placeholder?: string
+  // Style options (per question)
+  style?: QuestionStyle
 }
 
 // Database tables

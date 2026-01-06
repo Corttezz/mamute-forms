@@ -5,6 +5,6 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   // Mock callback - just redirect to dashboard
-  return NextResponse.redirect(`${origin}${next}`)
+      return NextResponse.redirect(`${origin}${next}`)
 }
 

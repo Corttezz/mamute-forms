@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { QuestionConfig } from '@/lib/database.types'
 import { getQuestionTypeInfo } from '@/lib/questions'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { Trash2, Plus, GripVertical, X } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Trash2, Plus, GripVertical, X, Code, Palette } from 'lucide-react'
+import { QuestionStyleEditor } from './question-style-editor'
+import { QuestionStyle } from '@/lib/database.types'
 
 interface QuestionEditorProps {
   question: QuestionConfig
@@ -18,6 +22,14 @@ interface QuestionEditorProps {
 
 export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorProps) {
   const typeInfo = getQuestionTypeInfo(question.type)
+  const [activeTab, setActiveTab] = useState('component')
+  
+  // Get style from question metadata or use defaults (empty means use theme defaults)
+  const questionStyle: QuestionStyle = question.style || {}
+
+  const handleStyleUpdate = (style: QuestionStyle) => {
+    onUpdate({ style })
+  }
 
   const addOption = () => {
     const options = question.options || []
@@ -36,7 +48,33 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
   }
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="h-full flex flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+        <div className="shrink-0 px-6 pt-4 pb-0 border-b border-slate-200">
+          <TabsList className="grid w-full grid-cols-3 bg-transparent p-0 gap-0 h-auto border-0 shadow-none">
+            <TabsTrigger 
+              value="component" 
+              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 mr-6 focus-visible:ring-0 focus-visible:outline-none"
+            >
+              Component
+            </TabsTrigger>
+            <TabsTrigger 
+              value="style" 
+              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 mr-6 focus-visible:ring-0 focus-visible:outline-none"
+            >
+              Style
+            </TabsTrigger>
+            <TabsTrigger 
+              value="logic" 
+              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 focus-visible:ring-0 focus-visible:outline-none"
+            >
+              Logic
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="component" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
+          <div className="p-4 space-y-6">
       {/* Question Type Badge */}
       <div className="flex items-center gap-2">
         {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
@@ -241,6 +279,26 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
         <Trash2 className="w-4 h-4 mr-2" />
         Delete question
       </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="style" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
+          <QuestionStyleEditor
+            style={questionStyle}
+            onUpdate={handleStyleUpdate}
+          />
+        </TabsContent>
+
+        <TabsContent value="logic" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
+          <div className="p-4">
+            <div className="text-center py-8">
+              <Code className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+              <p className="text-sm text-slate-500">Logic rules coming soon</p>
+              <p className="text-xs text-slate-400 mt-1">Add conditional logic to your questions</p>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
