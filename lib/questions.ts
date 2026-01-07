@@ -13,6 +13,16 @@ import {
   ThumbsUp, 
   Upload, 
   Link,
+  Home,
+  ArrowRight,
+  Loader2,
+  BarChart3,
+  Flag,
+  AlertTriangle,
+  Quote,
+  Image,
+  Timer,
+  Sliders,
   LucideIcon
 } from 'lucide-react'
 
@@ -28,7 +38,7 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'short_text',
     label: 'Short Text',
-    description: 'A single line text input',
+    description: 'Single-line text input.',
     icon: Type,
     defaultConfig: {
       placeholder: 'Type your answer here...',
@@ -37,34 +47,25 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'long_text',
     label: 'Long Text',
-    description: 'A multi-line text area',
+    description: 'Multi-line text input.',
     icon: AlignLeft,
     defaultConfig: {
       placeholder: 'Type your answer here...',
     },
   },
   {
-    type: 'dropdown',
-    label: 'Dropdown',
-    description: 'Select one option from a list',
-    icon: List,
+    type: 'number',
+    label: 'Number',
+    description: 'Numeric input.',
+    icon: Hash,
     defaultConfig: {
-      options: ['Option 1', 'Option 2', 'Option 3'],
-    },
-  },
-  {
-    type: 'checkboxes',
-    label: 'Checkboxes',
-    description: 'Select multiple options from a list',
-    icon: CheckSquare,
-    defaultConfig: {
-      options: ['Option 1', 'Option 2', 'Option 3'],
+      placeholder: '0',
     },
   },
   {
     type: 'email',
     label: 'Email',
-    description: 'An email address input',
+    description: 'Email address input.',
     icon: Mail,
     defaultConfig: {
       placeholder: 'name@example.com',
@@ -73,32 +74,41 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'phone',
     label: 'Phone',
-    description: 'A phone number input',
+    description: 'Phone number input.',
     icon: Phone,
     defaultConfig: {
       placeholder: '+1 (555) 000-0000',
     },
   },
   {
-    type: 'number',
-    label: 'Number',
-    description: 'A numeric input',
-    icon: Hash,
+    type: 'dropdown',
+    label: 'Dropdown',
+    description: 'Select one option from a list.',
+    icon: List,
     defaultConfig: {
-      placeholder: '0',
+      options: ['Option 1', 'Option 2', 'Option 3'],
     },
   },
   {
-    type: 'date',
-    label: 'Date',
-    description: 'A date picker',
-    icon: Calendar,
+    type: 'checkboxes',
+    label: 'Checkboxes',
+    description: 'Select multiple options.',
+    icon: CheckSquare,
+    defaultConfig: {
+      options: ['Option 1', 'Option 2', 'Option 3'],
+    },
+  },
+  {
+    type: 'yes_no',
+    label: 'Yes/No',
+    description: 'Binary choice input.',
+    icon: ThumbsUp,
     defaultConfig: {},
   },
   {
     type: 'rating',
     label: 'Rating',
-    description: 'A star rating (1-5)',
+    description: 'Star-based rating input.',
     icon: Star,
     defaultConfig: {
       minValue: 1,
@@ -108,7 +118,7 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'opinion_scale',
     label: 'Opinion Scale',
-    description: 'A numeric scale (1-10)',
+    description: 'Numeric scale (e.g. 1-10).',
     icon: Gauge,
     defaultConfig: {
       minValue: 1,
@@ -116,16 +126,26 @@ export const questionTypes: QuestionTypeInfo[] = [
     },
   },
   {
-    type: 'yes_no',
-    label: 'Yes / No',
-    description: 'A simple yes or no choice',
-    icon: ThumbsUp,
+    type: 'slider',
+    label: 'Level / Slider',
+    description: 'Numeric slider input.',
+    icon: Sliders,
+    defaultConfig: {
+      minValue: 0,
+      maxValue: 100,
+    },
+  },
+  {
+    type: 'date',
+    label: 'Date',
+    description: 'Date picker input.',
+    icon: Calendar,
     defaultConfig: {},
   },
   {
     type: 'file_upload',
     label: 'File Upload',
-    description: 'Upload images or PDFs',
+    description: 'Upload files or images.',
     icon: Upload,
     defaultConfig: {
       allowedFileTypes: ['image/*', 'application/pdf'],
@@ -135,7 +155,7 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'url',
     label: 'Website URL',
-    description: 'A URL input',
+    description: 'URL input field.',
     icon: Link,
     defaultConfig: {
       placeholder: 'https://example.com',
@@ -143,8 +163,98 @@ export const questionTypes: QuestionTypeInfo[] = [
   },
 ]
 
+// Flow Screens
+export const flowScreens: QuestionTypeInfo[] = [
+  {
+    type: 'welcome',
+    label: 'Welcome',
+    description: 'Intro screen with title, description and start button.',
+    icon: Home,
+    defaultConfig: {
+      title: 'Welcome',
+      description: 'Get started by clicking the button below',
+    },
+  },
+  {
+    type: 'loading',
+    label: 'Loading',
+    description: 'Temporary screen shown while processing data.',
+    icon: Loader2,
+    defaultConfig: {
+      title: 'Loading...',
+      description: 'Please wait while we process your information',
+    },
+  },
+  {
+    type: 'result',
+    label: 'Result',
+    description: 'Personalized result screen based on logic rules.',
+    icon: BarChart3,
+    defaultConfig: {
+      title: 'Your Result',
+      description: 'Based on your answers',
+    },
+  },
+  {
+    type: 'end',
+    label: 'End',
+    description: 'Final screen with closing message or CTA.',
+    icon: Flag,
+    defaultConfig: {
+      title: 'Thank you!',
+      description: 'Your response has been recorded',
+    },
+  },
+]
+
+// Content Screens
+export const contentScreens: QuestionTypeInfo[] = [
+  {
+    type: 'alert',
+    label: 'Alert',
+    description: 'Highlight important messages or warnings.',
+    icon: AlertTriangle,
+    defaultConfig: {
+      title: 'Alert',
+      description: 'Important information',
+    },
+  },
+  {
+    type: 'testimonials',
+    label: 'Testimonials',
+    description: 'Display social proof with name, rating and comment.',
+    icon: Quote,
+    defaultConfig: {
+      title: 'What our users say',
+      description: '',
+    },
+  },
+  {
+    type: 'media',
+    label: 'Media',
+    description: 'Image or video content screen.',
+    icon: Image,
+    defaultConfig: {
+      title: 'Media',
+      description: '',
+    },
+  },
+  {
+    type: 'timer',
+    label: 'Timer',
+    description: 'Countdown or timed message screen.',
+    icon: Timer,
+    defaultConfig: {
+      title: 'Timer',
+      description: '',
+    },
+  },
+]
+
 export function getQuestionTypeInfo(type: QuestionType): QuestionTypeInfo | undefined {
-  return questionTypes.find(qt => qt.type === type)
+  return questionTypes.find(qt => qt.type === type) ||
+         flowScreens.find(fs => fs.type === type) ||
+         contentScreens.find(cs => cs.type === type)
 }
 
 export function createDefaultQuestion(type: QuestionType): QuestionConfig {

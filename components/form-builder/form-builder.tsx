@@ -3,8 +3,7 @@
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Form, QuestionConfig, FormStatus } from '@/lib/database.types'
-import { questionTypes, createDefaultQuestion } from '@/lib/questions'
-import { getTheme, themes } from '@/lib/themes'
+import { questionTypes, flowScreens, contentScreens, createDefaultQuestion } from '@/lib/questions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,6 +35,10 @@ import {
   Pencil,
   BarChart3,
   Plug,
+  X,
+  Home,
+  ArrowRight,
+  Info,
 } from 'lucide-react'
 import Link from 'next/link'
 import { QuestionEditor } from './question-editor'
@@ -60,15 +63,6 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const selectedQuestion = questions.find(q => q.id === selectedQuestionId)
-  
-  // Get theme for selected question
-  const getSelectedQuestionTheme = () => {
-    if (!selectedQuestion) return themes.minimal
-    const questionTheme = selectedQuestion.style?.theme || 'minimal'
-    return getTheme(questionTheme)
-  }
-  
-  const previewTheme = getSelectedQuestionTheme()
 
   const handleSave = useCallback(async () => {
     setIsSaving(true)
@@ -162,7 +156,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-white overflow-hidden">
       {/* Header */}
       <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-4">
@@ -396,10 +390,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                   <Eye className="w-4 h-4 text-slate-500" />
                   <span className="text-sm font-medium text-slate-600">Preview</span>
                 </div>
-                <div 
-                  className="min-h-[500px] transition-colors"
-                  style={{ backgroundColor: previewTheme.backgroundColor }}
-                >
+                <div>
                   <FormPreview 
                     questions={questions}
                     selectedQuestionId={selectedQuestionId}
@@ -412,7 +403,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
           {/* Question Editor - Right side */}
           {selectedQuestion && (
-            <div className="w-96 bg-white border-l border-slate-200 overflow-hidden shrink-0 flex flex-col">
+            <div className="w-96 bg-white border-l border-slate-200 overflow-hidden shrink-0 flex flex-col h-full">
               <QuestionEditor
                 question={selectedQuestion}
                 onUpdate={(updates) => updateQuestion(selectedQuestion.id, updates)}
@@ -512,27 +503,114 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
         </div>
       )}
 
-      {/* Add Question Dialog */}
+      {/* Add Screen Dialog */}
       <Dialog open={showAddQuestion} onOpenChange={setShowAddQuestion}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Add Question</DialogTitle>
-            <DialogDescription>
-              Choose a question type to add to your form
+        <DialogContent className="max-w-[70vw] w-[70vw] max-h-[85vh] overflow-hidden flex flex-col p-0" showCloseButton={false}>
+          {/* Header with white background */}
+          <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+            <DialogTitle className="text-slate-900 text-xl font-semibold">Add Screen</DialogTitle>
+            <button
+              onClick={() => setShowAddQuestion(false)}
+              className="text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          {/* Subtitle */}
+          <div className="px-6 pt-4 pb-2">
+            <DialogDescription className="text-slate-600">
+              Choose a screen type to add to your form flow
             </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-3 gap-3 py-4">
-            {questionTypes.map((qt) => (
-              <button
-                key={qt.type}
-                onClick={() => addQuestion(qt.type)}
-                className="p-4 rounded-lg border border-slate-200 hover:border-primary/30 hover:bg-primary/10 transition-all text-left group"
-              >
-                <qt.icon className="w-6 h-6 text-slate-400 group-hover:text-primary mb-2" />
-                <p className="font-medium text-sm text-slate-900">{qt.label}</p>
-                <p className="text-xs text-slate-500 mt-1">{qt.description}</p>
-              </button>
-            ))}
+          </div>
+
+          {/* Content with scroll */}
+          <div className="flex-1 overflow-y-auto px-6 pb-4">
+            {/* Flow Screens */}
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Flow Screens</h3>
+              <div className="grid grid-cols-4 gap-3">
+                {flowScreens.map((screen) => (
+                  <button
+                    key={screen.type}
+                    onClick={() => {
+                      addQuestion(screen.type)
+                      setShowAddQuestion(false)
+                    }}
+                    className="p-4 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                  >
+                    {screen.type === 'welcome' ? (
+                      <div className="relative w-6 h-6 mb-2">
+                        <Home className="w-5 h-5 text-blue-500 absolute" />
+                        <ArrowRight className="w-3 h-3 text-blue-500 absolute right-0 bottom-0" />
+                      </div>
+                    ) : (
+                      <screen.icon className={`w-6 h-6 mb-2 ${
+                        screen.type === 'loading' || screen.type === 'result' ? 'text-purple-500' :
+                        'text-slate-400'
+                      } group-hover:scale-110 transition-transform`} />
+                    )}
+                    <p className="font-medium text-sm text-slate-900">{screen.label}</p>
+                    <p className="text-xs text-slate-500 mt-1">{screen.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Question Screens */}
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Question Screens</h3>
+              <div className="grid grid-cols-4 gap-3">
+                {questionTypes.map((qt) => (
+                  <button
+                    key={qt.type}
+                    onClick={() => {
+                      addQuestion(qt.type)
+                      setShowAddQuestion(false)
+                    }}
+                    className="p-4 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all text-left group"
+                  >
+                    <qt.icon className="w-6 h-6 text-slate-400 group-hover:text-slate-600 mb-2" />
+                    <p className="font-medium text-sm text-slate-900">{qt.label}</p>
+                    <p className="text-xs text-slate-500 mt-1">{qt.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content Screens */}
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Content Screens</h3>
+              <div className="grid grid-cols-4 gap-3">
+                {contentScreens.map((screen) => (
+                  <button
+                    key={screen.type}
+                    onClick={() => {
+                      addQuestion(screen.type)
+                      setShowAddQuestion(false)
+                    }}
+                    className="p-4 rounded-lg border border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                  >
+                    <screen.icon className={`w-6 h-6 mb-2 ${
+                      screen.type === 'media' ? 'text-pink-500' : 'text-orange-500'
+                    } group-hover:scale-110 transition-transform`} />
+                    <p className="font-medium text-sm text-slate-900">{screen.label}</p>
+                    <p className="text-xs text-slate-500 mt-1">{screen.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between bg-slate-50">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Info className="w-4 h-4" />
+              <span>Selection adds screen immediately</span>
+            </div>
+            <div className="text-xs text-slate-400 font-medium">
+              MamuteForms Builder
+            </div>
           </div>
         </DialogContent>
       </Dialog>

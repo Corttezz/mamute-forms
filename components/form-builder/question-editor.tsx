@@ -73,8 +73,8 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
           </TabsList>
         </div>
 
-        <TabsContent value="component" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
-          <div className="p-4 space-y-6">
+        <TabsContent value="component" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
+          <div className="p-6 space-y-6">
       {/* Question Type Badge */}
       <div className="flex items-center gap-2">
         {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
@@ -282,15 +282,15 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
           </div>
         </TabsContent>
 
-        <TabsContent value="style" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
+        <TabsContent value="style" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
           <QuestionStyleEditor
             style={questionStyle}
             onUpdate={handleStyleUpdate}
           />
         </TabsContent>
 
-        <TabsContent value="logic" className="flex-1 mt-0 overflow-auto data-[state=inactive]:hidden">
-          <div className="p-4">
+        <TabsContent value="logic" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
+          <div className="p-6">
             <div className="text-center py-8">
               <Code className="w-12 h-12 mx-auto text-slate-300 mb-3" />
               <p className="text-sm text-slate-500">Logic rules coming soon</p>

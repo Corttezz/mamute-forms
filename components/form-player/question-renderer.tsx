@@ -196,7 +196,7 @@ export function QuestionRenderer({
   const [isFocused, setIsFocused] = useState(false)
 
   const inputStyles = {
-    borderColor: error ? '#EF4444' : isFocused ? theme.primaryColor : `${theme.textColor}30`,
+    borderColor: error ? '#EF4444' : 'rgba(255, 255, 255, 0.3)',
     color: theme.textColor,
     backgroundColor: 'transparent',
   }
@@ -214,8 +214,8 @@ export function QuestionRenderer({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={question.placeholder || 'Type your answer here...'}
-          className="text-xl md:text-2xl h-auto py-3 px-0 border-0 border-b-2 rounded-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:opacity-40"
+          placeholder={question.placeholder || 'Type your answer here'}
+          className="text-lg h-auto py-4 px-0 border-0 border-b-2 rounded-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:opacity-60"
           style={inputStyles}
           autoFocus
         />
@@ -228,8 +228,8 @@ export function QuestionRenderer({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={question.placeholder || 'Type your answer here...'}
-          className="text-lg md:text-xl min-h-[150px] p-4 border-2 rounded-xl bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:opacity-40 resize-none"
+          placeholder={question.placeholder || 'Type your answer here'}
+          className="text-base min-h-[120px] p-4 border-2 rounded-xl bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:opacity-60 resize-none"
           style={inputStyles}
           autoFocus
         />
@@ -243,7 +243,7 @@ export function QuestionRenderer({
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="text-xl md:text-2xl h-auto py-3 px-0 border-0 border-b-2 rounded-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="text-lg h-auto py-4 px-0 border-0 border-b-2 rounded-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
           style={inputStyles}
           autoFocus
         />
@@ -275,21 +275,17 @@ export function QuestionRenderer({
                 }}
               >
                 <div 
-                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                  className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
                   style={{ 
-                    borderColor: isSelected ? theme.primaryColor : `${theme.textColor}40`,
-                    backgroundColor: isSelected ? theme.primaryColor : 'transparent',
+                    borderColor: 'rgba(255, 255, 255, 0.6)',
+                    backgroundColor: 'transparent',
                   }}
                 >
-                  {isSelected ? (
-                    <Check className="w-4 h-4" style={{ color: theme.backgroundColor }} />
-                  ) : (
-                    <span className="text-sm font-medium" style={{ color: theme.textColor }}>
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                  )}
+                  <span className="text-xs font-medium opacity-80">
+                    {String.fromCharCode(65 + index)}
+                  </span>
                 </div>
-                <span className="text-lg">{option}</span>
+                <span className="text-base">{option}</span>
               </motion.button>
             )
           })}
@@ -313,29 +309,25 @@ export function QuestionRenderer({
                     : [...selectedValues, option]
                   onChange(newValues)
                 }}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all"
+                className="w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all hover:bg-white/10"
                 style={{
-                  borderColor: isSelected ? theme.primaryColor : `${theme.textColor}20`,
-                  backgroundColor: isSelected ? `${theme.primaryColor}10` : 'transparent',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  backgroundColor: 'transparent',
                   color: theme.textColor,
                 }}
               >
                 <div 
-                  className="w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors"
+                  className="w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors"
                   style={{ 
-                    borderColor: isSelected ? theme.primaryColor : `${theme.textColor}40`,
-                    backgroundColor: isSelected ? theme.primaryColor : 'transparent',
+                    borderColor: 'rgba(255, 255, 255, 0.6)',
+                    backgroundColor: 'transparent',
                   }}
                 >
-                  {isSelected ? (
-                    <Check className="w-4 h-4" style={{ color: theme.backgroundColor }} />
-                  ) : (
-                    <span className="text-sm font-medium" style={{ color: theme.textColor }}>
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                  )}
+                  <span className="text-xs font-medium opacity-80">
+                    {String.fromCharCode(65 + index)}
+                  </span>
                 </div>
-                <span className="text-lg">{option}</span>
+                <span className="text-base">{option}</span>
               </motion.button>
             )
           })}
@@ -363,29 +355,14 @@ export function QuestionRenderer({
                   onClearError?.()
                   onSubmit(true)
                 }}
-                className="flex-1 flex items-center justify-center gap-3 p-5 rounded-xl border-2 transition-all"
+                className="flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all hover:bg-white/10"
                 style={{
-                  borderColor: isSelected ? theme.primaryColor : `${theme.textColor}20`,
-                  backgroundColor: isSelected ? `${theme.primaryColor}10` : 'transparent',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  backgroundColor: 'transparent',
                   color: theme.textColor,
                 }}
               >
-                <div 
-                  className="w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 transition-colors"
-                  style={{ 
-                    borderColor: isSelected ? theme.primaryColor : `${theme.textColor}40`,
-                    backgroundColor: isSelected ? theme.primaryColor : 'transparent',
-                  }}
-                >
-                  {isSelected ? (
-                    <Check className="w-4 h-4" style={{ color: theme.backgroundColor }} />
-                  ) : (
-                    <span className="text-sm font-medium" style={{ color: theme.textColor }}>
-                      {option[0]}
-                    </span>
-                  )}
-                </div>
-                <span className="text-xl font-medium">{option}</span>
+                <span className="text-base font-medium">{option}</span>
               </motion.button>
             )
           })}
@@ -409,10 +386,11 @@ export function QuestionRenderer({
                 className="p-1"
               >
                 <Star
-                  className="w-10 h-10 md:w-12 md:h-12 transition-colors"
-                  fill={isActive ? theme.primaryColor : 'transparent'}
+                  className="w-10 h-10 transition-all hover:scale-110 cursor-pointer"
+                  fill="none"
                   style={{ 
-                    color: isActive ? theme.primaryColor : `${theme.textColor}30`,
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    strokeWidth: 2,
                   }}
                 />
               </motion.button>
@@ -443,11 +421,11 @@ export function QuestionRenderer({
                   onClearError?.()
                   onSubmit(true)
                 }}
-                className="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 flex items-center justify-center text-lg font-medium transition-all"
+                className="w-12 h-12 rounded-xl border-2 flex items-center justify-center text-base font-semibold transition-all hover:bg-white/10 cursor-pointer"
                 style={{
-                  borderColor: isSelected ? theme.primaryColor : `${theme.textColor}30`,
-                  backgroundColor: isSelected ? theme.primaryColor : 'transparent',
-                  color: isSelected ? theme.backgroundColor : theme.textColor,
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  backgroundColor: 'transparent',
+                  color: theme.textColor,
                 }}
               >
                 {num}

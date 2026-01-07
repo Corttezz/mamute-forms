@@ -211,9 +211,9 @@ export function FormPlayer({ form }: FormPlayerProps) {
         className="min-h-screen flex items-center justify-center p-6"
         style={{ 
           ...themeStyles,
-          backgroundColor: theme.backgroundColor,
+          background: theme.backgroundColor,
           fontFamily: theme.fontFamily,
-        }}
+        } as React.CSSProperties}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -271,9 +271,9 @@ export function FormPlayer({ form }: FormPlayerProps) {
       <div 
         className="min-h-screen flex items-center justify-center p-6"
         style={{ 
-          backgroundColor: theme.backgroundColor,
+          background: theme.backgroundColor,
           fontFamily: theme.fontFamily,
-        }}
+        } as React.CSSProperties}
       >
         <p style={{ color: theme.textColor }} className="opacity-50">
           This form has no questions yet.
@@ -303,27 +303,23 @@ export function FormPlayer({ form }: FormPlayerProps) {
       className="min-h-screen flex flex-col"
       style={{ 
         ...themeStyles,
-        backgroundColor: theme.backgroundColor,
+        background: theme.backgroundColor,
         fontFamily: theme.fontFamily,
-      }}
+      } as React.CSSProperties}
     >
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Progress 
-          value={progress} 
-          className="h-1 rounded-none"
-          style={{ 
-            backgroundColor: `${theme.primaryColor}20`,
-          }}
-          indicatorStyle={{
-            backgroundColor: theme.primaryColor,
-          }}
-        />
+        <div className="h-1 bg-white/20">
+          <div 
+            className="h-full bg-white/60 transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center p-6 pt-12">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-xl">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentIndex}
@@ -334,28 +330,12 @@ export function FormPlayer({ form }: FormPlayerProps) {
               exit="exit"
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              {/* Question number */}
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-                className="mb-6 flex items-center gap-2"
-              >
-                <span 
-                  className="text-base font-medium"
-                  style={{ color: theme.primaryColor }}
-                >
-                  {currentIndex + 1}
-                </span>
-                <ArrowRight className="w-4 h-4" style={{ color: theme.primaryColor }} />
-              </motion.div>
-
               {/* Question */}
               <motion.h2 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3"
+                className="text-3xl font-bold mb-4 leading-tight"
                 style={{ color: theme.textColor }}
               >
                 {currentQuestion.title || 'Untitled question'}
@@ -369,7 +349,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-lg md:text-xl opacity-70 mb-8"
+                  className="text-base opacity-80 mb-8 leading-relaxed"
                   style={{ color: theme.textColor }}
                 >
                   {currentQuestion.description}
@@ -425,38 +405,34 @@ export function FormPlayer({ form }: FormPlayerProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="mt-8 flex items-center gap-4"
+                className="mt-8"
               >
                 <Button
                   onClick={() => goToNext()}
                   disabled={isSubmitting}
-                  className="h-12 px-6 text-base font-medium"
+                  className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
                   style={{ 
-                    backgroundColor: theme.primaryColor,
-                    color: theme.backgroundColor,
+                    backgroundColor: 'white',
+                    color: theme.primaryColor,
                   }}
                 >
                   {isSubmitting ? (
                     'Submitting...'
                   ) : isLastQuestion ? (
-                    <>
-                      Submit
-                      <Check className="w-4 h-4 ml-2" />
-                    </>
+                    'Submit'
                   ) : (
-                    <>
-                      OK
-                      <Check className="w-4 h-4 ml-2" />
-                    </>
+                    'Continue'
                   )}
                 </Button>
-
-                <span 
-                  className="text-sm opacity-50"
-                  style={{ color: theme.textColor }}
-                >
-                  press <kbd className="font-mono font-medium">Enter ↵</kbd>
-                </span>
+                
+                <div className="mt-3 text-center">
+                  <span 
+                    className="text-sm opacity-70"
+                    style={{ color: theme.textColor }}
+                  >
+                    Or press enter ↵
+                  </span>
+                </div>
               </motion.div>
             </motion.div>
           </AnimatePresence>

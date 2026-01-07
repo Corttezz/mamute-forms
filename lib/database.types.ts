@@ -8,6 +8,12 @@ export type Json =
 
 // Question types supported by the form builder
 export type QuestionType =
+  // Flow Screens
+  | 'welcome'
+  | 'loading'
+  | 'result'
+  | 'end'
+  // Question Screens
   | 'short_text'
   | 'long_text'
   | 'dropdown'
@@ -21,6 +27,12 @@ export type QuestionType =
   | 'yes_no'
   | 'file_upload'
   | 'url'
+  | 'slider'
+  // Content Screens
+  | 'alert'
+  | 'testimonials'
+  | 'media'
+  | 'timer'
 
 // Form status
 export type FormStatus = 'draft' | 'published' | 'closed'

@@ -73,61 +73,68 @@ export function FormPreview({
   const questionIndex = questions.findIndex(q => q.id === selectedQuestion.id)
 
   return (
-    <div className="p-8">
+    <div 
+      className="h-full flex flex-col"
+      style={{ 
+        background: qStyle.theme.backgroundColor,
+      } as React.CSSProperties}
+    >
       <motion.div
         key={selectedQuestion.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
         className={`
-          p-6 rounded-xl transition-all flex flex-col ${alignmentClass} ${isCentered ? 'min-h-[400px]' : ''}
+          px-12 py-16 h-full transition-all flex flex-col ${alignmentClass} ${isCentered ? 'justify-center' : 'justify-start'}
         `}
         style={{ 
-          backgroundColor: qStyle.theme.backgroundColor,
           fontFamily: qStyle.fontFamily,
         } as React.CSSProperties}
       >
-        <div className="mb-4">
-          <span 
-            className="text-sm font-medium opacity-60"
-            style={{ color: qStyle.textColor }}
-          >
-            {questionIndex + 1} →
-          </span>
+        <div className="mb-8 max-w-xl w-full">
+          {/* Progress bar */}
+          <div className="h-1 bg-white/20 rounded-full mb-12 overflow-hidden">
+            <div 
+              className="h-full bg-white/60 rounded-full transition-all"
+              style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }}
+            />
+          </div>
         </div>
         
-        <h3 
-          className="text-xl font-semibold mb-2"
-          style={{ color: qStyle.textColor }}
-        >
-          {selectedQuestion.title || 'Untitled question'}
-          {selectedQuestion.required && (
-            <span style={{ color: qStyle.buttonBackgroundColor }} className="ml-1">*</span>
-          )}
-        </h3>
-        
-        {selectedQuestion.description && (
-          <p 
-            className="text-sm opacity-70 mb-4"
+        <div className="max-w-xl w-full">
+          <h3 
+            className="text-3xl font-bold mb-4 leading-tight"
             style={{ color: qStyle.textColor }}
           >
-            {selectedQuestion.description}
-          </p>
-        )}
+            {selectedQuestion.title || 'Untitled question'}
+            {selectedQuestion.required && (
+              <span style={{ color: qStyle.buttonBackgroundColor }} className="ml-1">*</span>
+            )}
+          </h3>
+          
+          {selectedQuestion.description && (
+            <p 
+              className="text-base opacity-80 mb-8 leading-relaxed"
+              style={{ color: qStyle.textColor }}
+            >
+              {selectedQuestion.description}
+            </p>
+          )}
+        </div>
 
         {/* Preview of input types */}
-        <div className="mt-4 w-full">
+        <div className="mt-6 w-full max-w-xl">
           {(selectedQuestion.type === 'short_text' || selectedQuestion.type === 'email' || 
             selectedQuestion.type === 'phone' || selectedQuestion.type === 'url' || 
             selectedQuestion.type === 'number') && (
             <div 
-              className="border-b-2 py-2 text-lg opacity-50 w-full"
+              className="border-b-2 py-4 text-lg opacity-60 w-full placeholder-shown"
               style={{ 
-                borderColor: qStyle.buttonBackgroundColor,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
                 color: qStyle.textColor 
               }}
             >
-              {selectedQuestion.placeholder || 'Type your answer here...'}
+              {selectedQuestion.placeholder || 'Type your answer here'}
             </div>
           )}
 
@@ -145,9 +152,9 @@ export function FormPreview({
 
           {selectedQuestion.type === 'date' && (
             <div 
-              className="border-b-2 py-2 text-lg opacity-50 w-full"
+              className="border-b-2 py-4 text-lg opacity-60 w-full"
               style={{ 
-                borderColor: qStyle.buttonBackgroundColor,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
                 color: qStyle.textColor 
               }}
             >
@@ -156,62 +163,54 @@ export function FormPreview({
           )}
 
           {(selectedQuestion.type === 'dropdown' || selectedQuestion.type === 'checkboxes') && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {(selectedQuestion.options || []).map((option, i) => (
                 <div 
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-lg border-2 transition-colors hover:border-opacity-100"
+                  className="flex items-center gap-4 p-4 rounded-xl border-2 transition-colors hover:bg-white/10"
                   style={{ 
-                    borderColor: `${qStyle.buttonBackgroundColor}40`,
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                     color: qStyle.textColor 
                   }}
                 >
                   <div 
                     className={`w-6 h-6 rounded-${selectedQuestion.type === 'dropdown' ? 'full' : 'md'} border-2 flex items-center justify-center`}
-                    style={{ borderColor: qStyle.buttonBackgroundColor }}
+                    style={{ borderColor: 'rgba(255, 255, 255, 0.6)' }}
                   >
-                    <span className="text-xs font-medium" style={{ color: qStyle.buttonBackgroundColor }}>
+                    <span className="text-xs font-medium opacity-80">
                       {String.fromCharCode(65 + i)}
                     </span>
                   </div>
-                  <span>{option}</span>
+                  <span className="text-base">{option}</span>
                 </div>
               ))}
             </div>
           )}
 
           {selectedQuestion.type === 'yes_no' && (
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {['Yes', 'No'].map((option, i) => (
                 <div 
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-lg border-2 flex-1 justify-center transition-colors"
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 flex-1 justify-center transition-colors hover:bg-white/10"
                   style={{ 
-                    borderColor: `${qStyle.buttonBackgroundColor}40`,
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                     color: qStyle.textColor 
                   }}
                 >
-                  <div 
-                    className="w-6 h-6 rounded-md border-2 flex items-center justify-center"
-                    style={{ borderColor: qStyle.buttonBackgroundColor }}
-                  >
-                    <span className="text-xs font-medium" style={{ color: qStyle.buttonBackgroundColor }}>
-                      {option[0]}
-                    </span>
-                  </div>
-                  <span>{option}</span>
+                  <span className="text-base font-medium">{option}</span>
                 </div>
               ))}
             </div>
           )}
 
           {selectedQuestion.type === 'rating' && (
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               {Array.from({ length: selectedQuestion.maxValue || 5 }).map((_, i) => (
                 <Star 
                   key={i}
-                  className="w-8 h-8"
-                  style={{ color: `${qStyle.buttonBackgroundColor}40` }}
+                  className="w-10 h-10 transition-all hover:scale-110 cursor-pointer"
+                  style={{ color: 'rgba(255, 255, 255, 0.3)', fill: 'none', strokeWidth: 2 }}
                 />
               ))}
             </div>
@@ -222,9 +221,9 @@ export function FormPreview({
               {Array.from({ length: (selectedQuestion.maxValue || 10) - (selectedQuestion.minValue || 1) + 1 }).map((_, i) => (
                 <div 
                   key={i}
-                  className="w-10 h-10 rounded-lg border-2 flex items-center justify-center text-sm font-medium"
+                  className="w-12 h-12 rounded-xl border-2 flex items-center justify-center text-base font-semibold transition-all hover:bg-white/10 cursor-pointer"
                   style={{ 
-                    borderColor: `${qStyle.buttonBackgroundColor}40`,
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
                     color: qStyle.textColor 
                   }}
                 >
@@ -236,14 +235,14 @@ export function FormPreview({
 
           {selectedQuestion.type === 'file_upload' && (
             <div 
-              className="border-2 border-dashed rounded-lg p-6 text-center opacity-70"
+              className="border-2 border-dashed rounded-xl p-8 text-center transition-all hover:bg-white/5"
               style={{ 
-                borderColor: `${qStyle.buttonBackgroundColor}40`,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
                 color: qStyle.textColor 
               }}
             >
-              <p className="text-sm">Drop files here or click to upload</p>
-              <p className="text-xs opacity-60 mt-1">
+              <p className="text-base opacity-80">Drop files here or click to upload</p>
+              <p className="text-sm opacity-60 mt-2">
                 Images & PDFs up to {selectedQuestion.maxFileSize || 10}MB
               </p>
             </div>
@@ -251,30 +250,23 @@ export function FormPreview({
         </div>
 
         {/* Button preview */}
-        <div className="mt-6">
+        <div className="mt-8 max-w-xl w-full">
           <button
-            className="px-6 py-3 rounded-lg font-medium transition-all hover:opacity-90"
+            className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
             style={{
-              backgroundColor: qStyle.buttonBackgroundColor,
-              color: qStyle.buttonTextColor,
+              backgroundColor: 'white',
+              color: qStyle.theme.primaryColor,
             }}
           >
-            OK
+            Continue
           </button>
-        </div>
-
-        {/* Keyboard hint */}
-        <div className="mt-4 flex items-center gap-2 opacity-50">
-          <span className="text-xs" style={{ color: qStyle.textColor }}>Press</span>
-          <kbd 
-            className="px-2 py-1 rounded text-xs font-medium"
-            style={{ 
-              backgroundColor: `${qStyle.buttonBackgroundColor}20`,
-              color: qStyle.textColor 
-            }}
-          >
-            Enter ↵
-          </kbd>
+          
+          {/* Keyboard hint */}
+          <div className="mt-3 text-center">
+            <span className="text-sm opacity-70" style={{ color: qStyle.textColor }}>
+              Or press enter ↵
+            </span>
+          </div>
         </div>
       </motion.div>
     </div>
