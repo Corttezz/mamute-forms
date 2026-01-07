@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Form, QuestionConfig, FormStatus } from '@/lib/database.types'
-import { questionTypes, flowScreens, contentScreens, createDefaultQuestion } from '@/lib/questions'
+import { questionTypes, flowScreens, contentScreens, createDefaultQuestion, getQuestionTypeInfo } from '@/lib/questions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,6 +43,7 @@ import {
 import Link from 'next/link'
 import { QuestionEditor } from './question-editor'
 import { FormPreview } from './form-preview'
+import { UpgradeBanner } from '@/components/upgrade/upgrade-banner'
 
 interface FormBuilderProps {
   form: Form
@@ -341,9 +342,24 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                                     <span className="text-xs text-red-500">*</span>
                                   )}
                                 </div>
-                                <p className="text-sm font-medium text-slate-900 truncate">
-                                  {question.title || 'Untitled question'}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  {(() => {
+                                    const typeInfo = getQuestionTypeInfo(question.type)
+                                    const Icon = typeInfo?.icon
+                                    if (Icon) {
+                                      return <Icon className="w-4 h-4 text-slate-900 flex-shrink-0" />
+                                    }
+                                    return null
+                                  })()}
+                                  <p className="text-sm font-medium text-slate-900 truncate">
+                                    {question.title || 'Untitled question'}
+                                  </p>
+                                </div>
+                                {question.description && (
+                                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                                    {question.description}
+                                  </p>
+                                )}
                               </div>
                               <Button
                                 variant="ghost"
@@ -398,6 +414,11 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                   />
                 </div>
               </div>
+              
+              {/* Upgrade Banner */}
+              <div className="max-w-2xl mx-auto flex justify-center mt-4">
+                <UpgradeBanner />
+              </div>
             </div>
           </div>
 
@@ -406,6 +427,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
             <div className="w-96 bg-white border-l border-slate-200 overflow-hidden shrink-0 flex flex-col h-full">
               <QuestionEditor
                 question={selectedQuestion}
+                questions={questions}
                 onUpdate={(updates) => updateQuestion(selectedQuestion.id, updates)}
                 onDelete={() => deleteQuestion(selectedQuestion.id)}
               />

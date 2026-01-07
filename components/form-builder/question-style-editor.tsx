@@ -26,6 +26,7 @@ const fontFamilies = [
 ]
 
 const quickColors = [
+  { name: 'White', value: '#ffffff' },
   { name: 'Blue', value: '#2563eb' },
   { name: 'Purple', value: '#9333ea' },
   { name: 'Pink', value: '#ec4899' },

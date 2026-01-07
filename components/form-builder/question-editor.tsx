@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { QuestionConfig } from '@/lib/database.types'
+import { QuestionConfig, NavigationTarget, QuestionLogic } from '@/lib/database.types'
 import { getQuestionTypeInfo } from '@/lib/questions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,26 +10,44 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Trash2, Plus, GripVertical, X, Code, Palette } from 'lucide-react'
 import { QuestionStyleEditor } from './question-style-editor'
 import { QuestionStyle } from '@/lib/database.types'
 
 interface QuestionEditorProps {
   question: QuestionConfig
+  questions?: QuestionConfig[] // All questions for navigation target dropdown
   onUpdate: (updates: Partial<QuestionConfig>) => void
   onDelete: () => void
 }
 
-export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorProps) {
+export function QuestionEditor({ question, questions = [], onUpdate, onDelete }: QuestionEditorProps) {
   const typeInfo = getQuestionTypeInfo(question.type)
   const [activeTab, setActiveTab] = useState('component')
   
   // Get style from question metadata or use defaults (empty means use theme defaults)
   const questionStyle: QuestionStyle = question.style || {}
+  
+  // Get logic from question or use defaults
+  const logic: QuestionLogic = question.logic || {}
 
   const handleStyleUpdate = (style: QuestionStyle) => {
     onUpdate({ style })
   }
+  
+  const handleLogicUpdate = (updates: Partial<QuestionLogic>) => {
+    onUpdate({ logic: { ...logic, ...updates } })
+  }
+  
+  const isFlowScreen = question.type === 'welcome' || question.type === 'end' || 
+                       question.type === 'loading' || question.type === 'result'
 
   const addOption = () => {
     const options = question.options || []
@@ -75,20 +93,45 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
 
         <TabsContent value="component" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
           <div className="p-6 space-y-6">
-      {/* Question Type Badge */}
-      <div className="flex items-center gap-2">
-        {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
-        <span className="text-sm font-medium text-slate-600">{typeInfo?.label}</span>
-      </div>
+      {/* Screen Type (for flow screens) */}
+      {isFlowScreen && (
+        <div>
+          <Label htmlFor="screen-type" className="text-sm font-medium">Screen type</Label>
+          <Select
+            value={question.type}
+            onValueChange={(value) => onUpdate({ type: value as QuestionConfig['type'] })}
+          >
+            <SelectTrigger id="screen-type" className="mt-2 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="welcome">Welcome</SelectItem>
+              <SelectItem value="loading">Loading</SelectItem>
+              <SelectItem value="result">Result</SelectItem>
+              <SelectItem value="end">End</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-      {/* Question Title */}
+      {/* Question Type Badge (for regular questions) */}
+      {!isFlowScreen && (
+        <div className="flex items-center gap-2">
+          {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
+          <span className="text-sm font-medium text-slate-600">{typeInfo?.label}</span>
+        </div>
+      )}
+
+      {/* Title */}
       <div>
-        <Label htmlFor="title" className="text-sm font-medium">Question</Label>
+        <Label htmlFor="title" className="text-sm font-medium">
+          {isFlowScreen ? 'Title' : 'Question'}
+        </Label>
         <Textarea
           id="title"
           value={question.title}
           onChange={(e) => onUpdate({ title: e.target.value })}
-          placeholder="Type your question here..."
+          placeholder={isFlowScreen ? "Enter title..." : "Type your question here..."}
           className="mt-2 resize-none"
           rows={2}
         />
@@ -109,7 +152,31 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
         />
       </div>
 
-      <Separator />
+      {/* Button Text (for all screens with buttons) */}
+      <div>
+        <Label htmlFor="button-text" className="text-sm font-medium">Button text</Label>
+        <Input
+          id="button-text"
+          value={question.buttonText || ''}
+          onChange={(e) => onUpdate({ buttonText: e.target.value })}
+          placeholder={
+            question.type === 'welcome' ? 'Start' : 
+            question.type === 'end' ? 'Close' : 
+            'Continue'
+          }
+          className="mt-2"
+        />
+        <p className="text-xs text-slate-500 mt-1">
+          {question.type === 'welcome' || question.type === 'end' 
+            ? 'Text displayed on the action button'
+            : 'Leave empty to use default (Continue/Submit)'}
+        </p>
+      </div>
+
+      {/* Separator only if there are type-specific settings below */}
+      {!isFlowScreen && (
+        <Separator />
+      )}
 
       {/* Type-specific settings */}
       {(question.type === 'dropdown' || question.type === 'checkboxes') && (
@@ -254,19 +321,22 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
         </div>
       )}
 
-      <Separator />
-
-      {/* Required toggle */}
-      <div className="flex items-center justify-between">
-        <div>
-          <Label className="text-sm font-medium">Required</Label>
-          <p className="text-xs text-slate-500">Respondents must answer this question</p>
-        </div>
-        <Switch
-          checked={question.required}
-          onCheckedChange={(checked) => onUpdate({ required: checked })}
-        />
-      </div>
+      {/* Required toggle (only for questions, not flow screens) */}
+      {!isFlowScreen && (
+        <>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium">Required</Label>
+              <p className="text-xs text-slate-500">Respondents must answer this question</p>
+            </div>
+            <Switch
+              checked={question.required}
+              onCheckedChange={(checked) => onUpdate({ required: checked })}
+            />
+          </div>
+        </>
+      )}
 
       <Separator />
 
@@ -290,11 +360,126 @@ export function QuestionEditor({ question, onUpdate, onDelete }: QuestionEditorP
         </TabsContent>
 
         <TabsContent value="logic" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
-          <div className="p-6">
-            <div className="text-center py-8">
-              <Code className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-              <p className="text-sm text-slate-500">Logic rules coming soon</p>
-              <p className="text-xs text-slate-400 mt-1">Add conditional logic to your questions</p>
+          <div className="p-6 space-y-6">
+            {/* Auto-advance */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <Label className="text-sm font-medium">Enable auto-advance</Label>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Automatically advance to the next screen
+                  </p>
+                </div>
+                <Switch
+                  checked={logic.autoAdvance?.enabled || false}
+                  onCheckedChange={(checked) => 
+                    handleLogicUpdate({ 
+                      autoAdvance: { 
+                        ...logic.autoAdvance, 
+                        enabled: checked,
+                        delaySeconds: logic.autoAdvance?.delaySeconds || 3
+                      } 
+                    })
+                  }
+                />
+              </div>
+              
+              {logic.autoAdvance?.enabled && (
+                <div>
+                  <Label htmlFor="delay-seconds" className="text-sm font-medium">
+                    Delay (seconds)
+                  </Label>
+                  <Input
+                    id="delay-seconds"
+                    type="number"
+                    value={logic.autoAdvance?.delaySeconds || 3}
+                    onChange={(e) => 
+                      handleLogicUpdate({ 
+                        autoAdvance: { 
+                          ...logic.autoAdvance, 
+                          enabled: true,
+                          delaySeconds: parseInt(e.target.value) || 3
+                        } 
+                      })
+                    }
+                    min={1}
+                    max={60}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    How long to wait before advancing to the next screen
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* Navigation behavior */}
+            <div className="space-y-4">
+              <Label className="text-sm font-medium">Navigation behavior</Label>
+              
+              <div>
+                <Label htmlFor="on-button-click" className="text-sm font-medium">
+                  On button click (or auto-advance), go to:
+                </Label>
+                <Select
+                  value={logic.navigationBehavior?.onButtonClick || 'next_screen'}
+                  onValueChange={(value: NavigationTarget) => 
+                    handleLogicUpdate({ 
+                      navigationBehavior: { 
+                        ...logic.navigationBehavior, 
+                        onButtonClick: value 
+                      } 
+                    })
+                  }
+                >
+                  <SelectTrigger id="on-button-click" className="mt-2 w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="next_screen">Next screen</SelectItem>
+                    <SelectItem value="previous_screen">Previous screen</SelectItem>
+                    <SelectItem value="specific_screen">Specific screen</SelectItem>
+                    <SelectItem value="end_form">End form</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-slate-500 mt-1">
+                  Define what happens when user clicks the button
+                </p>
+              </div>
+
+              {logic.navigationBehavior?.onButtonClick === 'specific_screen' && (
+                <div>
+                  <Label htmlFor="target-screen" className="text-sm font-medium">
+                    Select screen:
+                  </Label>
+                  <Select
+                    value={logic.navigationBehavior?.targetScreenId || ''}
+                    onValueChange={(value) => 
+                      handleLogicUpdate({ 
+                        navigationBehavior: { 
+                          ...logic.navigationBehavior, 
+                          targetScreenId: value 
+                        } 
+                      })
+                    }
+                  >
+                    <SelectTrigger id="target-screen" className="mt-2 w-full">
+                      <SelectValue placeholder="Select a screen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {questions
+                        .filter(q => q.id !== question.id)
+                        .map((q) => (
+                          <SelectItem key={q.id} value={q.id}>
+                            {q.title || `Untitled (${q.type})`}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>

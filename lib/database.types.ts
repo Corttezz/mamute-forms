@@ -66,6 +66,28 @@ export interface QuestionStyle {
   verticalAlignment?: 'center' | 'left'
 }
 
+// Navigation behavior types
+export type NavigationTarget = 
+  | 'next_screen'
+  | 'previous_screen'
+  | 'specific_screen'
+  | 'end_form'
+
+// Logic configuration for questions
+export interface QuestionLogic {
+  // Auto-advance settings
+  autoAdvance?: {
+    enabled: boolean
+    delaySeconds?: number // How long to wait before advancing
+  }
+  // Navigation behavior
+  navigationBehavior?: {
+    onButtonClick?: NavigationTarget
+    onAutoAdvance?: NavigationTarget
+    targetScreenId?: string // Required if target is 'specific_screen'
+  }
+}
+
 // Question configuration
 export interface QuestionConfig {
   id: string
@@ -73,6 +95,8 @@ export interface QuestionConfig {
   title: string
   description?: string
   required: boolean
+  // Button text for welcome/end screens
+  buttonText?: string
   // Type-specific options
   options?: string[] // For dropdown and checkboxes
   minValue?: number // For rating (1-5 stars) or opinion_scale (1-10)
@@ -82,6 +106,8 @@ export interface QuestionConfig {
   placeholder?: string
   // Style options (per question)
   style?: QuestionStyle
+  // Logic options
+  logic?: QuestionLogic
 }
 
 // Database tables

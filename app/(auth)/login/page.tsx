@@ -27,11 +27,11 @@ export default function LoginPage() {
       toast.error('Please enter your email and password')
       return
     }
-
+    
     setIsLoading(true)
     try {
       // Mock login - just redirect to dashboard
-      setTimeout(() => {
+    setTimeout(() => {
         router.push('/dashboard')
         toast.success('Welcome back!')
       }, 500)
@@ -54,17 +54,17 @@ export default function LoginPage() {
             </h1>
 
             <form onSubmit={handleLogin} className="mt-8 space-y-6">
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <Label htmlFor="email" className="text-[14px] text-slate-700" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                   Email
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
+              <Input
+                id="email"
+                type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
                   className="h-12 text-[14px] border-slate-200"
                   style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
                 />
@@ -83,8 +83,8 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="h-12 text-[14px] border-slate-200"
                   style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-                />
-              </div>
+              />
+            </div>
 
               <div className="flex items-center justify-between">
                 <Checkbox
@@ -102,14 +102,14 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
+            <Button
+              type="submit"
+              disabled={isLoading}
                 className="w-full h-12 bg-[#111827] hover:bg-[#111827]/90 text-white text-[14px] font-medium"
                 style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
-              </Button>
+            </Button>
 
               <p className="text-center text-[14px] text-slate-600" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                 Don&apos;t have an account?{' '}
@@ -117,7 +117,7 @@ export default function LoginPage() {
                   Sign up
                 </Link>
               </p>
-            </form>
+          </form>
           </div>
         </div>
 

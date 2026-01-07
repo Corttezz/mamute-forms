@@ -20,6 +20,19 @@ export function FormPlayer({ form }: FormPlayerProps) {
   const questions = (form.questions as QuestionConfig[]) || []
   const theme = getTheme(form.theme)
   const themeStyles = getThemeCSSVariables(theme)
+  
+  // Helper to get style for a question, falling back to theme defaults
+  const getQuestionStyle = (question: QuestionConfig) => {
+    const questionTheme = question.style?.theme ? getTheme(question.style.theme) : theme
+    const style = question.style || {}
+    return {
+      fontFamily: style.fontFamily || questionTheme.fontFamily,
+      textColor: style.textColor || questionTheme.textColor,
+      buttonBackgroundColor: style.buttonBackgroundColor || 'white',
+      buttonTextColor: style.buttonTextColor || questionTheme.primaryColor,
+      theme: questionTheme,
+    }
+  }
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, Json>>({})
@@ -35,6 +48,10 @@ export function FormPlayer({ form }: FormPlayerProps) {
   const isLastQuestion = currentIndex === questions.length - 1
   const isFirstQuestion = currentIndex === 0
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0
+  
+  // Get style for current question - recalculate when question changes
+  const questionStyle = currentQuestion ? getQuestionStyle(currentQuestion) : null
+  const displayTheme = questionStyle?.theme || theme
 
   const validateCurrentQuestion = useCallback(() => {
     if (!currentQuestion) return true
@@ -86,27 +103,53 @@ export function FormPlayer({ form }: FormPlayerProps) {
     return true
   }, [currentQuestion, answers, errors])
 
+  const getNavigationTarget = useCallback((question: QuestionConfig): number | 'submit' => {
+    const navBehavior = question.logic?.navigationBehavior
+    const target = navBehavior?.onButtonClick || 'next_screen'
+    
+    if (target === 'end_form') {
+      return 'submit' // Submit the form
+    } else if (target === 'previous_screen') {
+      return Math.max(0, currentIndex - 1)
+    } else if (target === 'specific_screen' && navBehavior?.targetScreenId) {
+      const targetIndex = questions.findIndex(q => q.id === navBehavior.targetScreenId)
+      return targetIndex >= 0 ? targetIndex : currentIndex + 1
+    } else {
+      // next_screen (default)
+      return Math.min(currentIndex + 1, questions.length - 1)
+    }
+  }, [questions, currentIndex])
+
   const goToNext = useCallback((skipValidation?: boolean) => {
     // Check both the parameter and the ref for skip validation
     const shouldSkip = skipValidation || skipNextValidationRef.current
     skipNextValidationRef.current = false // Reset the ref
     
-    if (!shouldSkip && !validateCurrentQuestion()) return
+    // Flow screens (welcome, end, etc.) don't need validation
+    const isFlowScreen = currentQuestion?.type === 'welcome' || 
+                        currentQuestion?.type === 'end' || 
+                        currentQuestion?.type === 'loading' || 
+                        currentQuestion?.type === 'result'
     
-    if (isLastQuestion) {
+    if (!shouldSkip && !isFlowScreen && !validateCurrentQuestion()) return
+    
+    // Check navigation behavior
+    const target = getNavigationTarget(currentQuestion)
+    
+    if (target === 'submit' || isLastQuestion) {
       handleSubmit()
     } else {
       setDirection(1)
-      setCurrentIndex(prev => Math.min(prev + 1, questions.length - 1))
+      setCurrentIndex(target)
     }
-  }, [isLastQuestion, questions.length, validateCurrentQuestion])
+  }, [isLastQuestion, currentQuestion, validateCurrentQuestion, getNavigationTarget, handleSubmit])
 
   const goToPrevious = useCallback(() => {
     setDirection(-1)
     setCurrentIndex(prev => Math.max(prev - 1, 0))
   }, [])
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!validateCurrentQuestion()) return
     
     setIsSubmitting(true)
@@ -125,7 +168,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
     } else {
       setIsSubmitted(true)
     }
-  }
+  }, [validateCurrentQuestion, form.id, answers, supabase])
 
   const updateAnswer = (questionId: string, value: Json) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }))
@@ -170,6 +213,21 @@ export function FormPlayer({ form }: FormPlayerProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [currentQuestion, goToNext, goToPrevious, isSubmitted, isSubmitting])
 
+  // Auto-advance logic
+  useEffect(() => {
+    if (isSubmitted || isSubmitting) return
+    
+    const autoAdvance = currentQuestion?.logic?.autoAdvance
+    if (!autoAdvance?.enabled) return
+    
+    const delay = (autoAdvance.delaySeconds || 3) * 1000
+    const timer = setTimeout(() => {
+      goToNext(true) // Skip validation for auto-advance
+    }, delay)
+    
+    return () => clearTimeout(timer)
+  }, [currentIndex, currentQuestion, isSubmitted, isSubmitting, goToNext])
+
   // Scroll/wheel navigation
   useEffect(() => {
     let lastScrollTime = 0
@@ -211,8 +269,8 @@ export function FormPlayer({ form }: FormPlayerProps) {
         className="min-h-screen flex items-center justify-center p-6"
         style={{ 
           ...themeStyles,
-          background: theme.backgroundColor,
-          fontFamily: theme.fontFamily,
+          background: displayTheme.backgroundColor,
+          fontFamily: questionStyle?.fontFamily || theme.fontFamily,
         } as React.CSSProperties}
       >
         <motion.div
@@ -227,17 +285,17 @@ export function FormPlayer({ form }: FormPlayerProps) {
             className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center"
             style={{ backgroundColor: `${theme.primaryColor}20` }}
           >
-            <Check className="w-10 h-10" style={{ color: theme.primaryColor }} />
+            <Check className="w-10 h-10" style={{ color: displayTheme.primaryColor }} />
           </motion.div>
           <h1 
             className="text-3xl md:text-4xl font-bold mb-4"
-            style={{ color: theme.textColor }}
+            style={{ color: questionStyle?.textColor || displayTheme.textColor }}
           >
             {form.thank_you_message}
           </h1>
           <p 
             className="text-lg opacity-70"
-            style={{ color: theme.textColor }}
+            style={{ color: questionStyle?.textColor || displayTheme.textColor }}
           >
             Your response has been recorded.
           </p>
@@ -254,7 +312,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm opacity-50 hover:opacity-70 transition-opacity"
-              style={{ color: theme.textColor }}
+              style={{ color: questionStyle?.textColor || displayTheme.textColor }}
             >
               <span>Made with</span>
               <span className="font-semibold">MamuteForms</span>
@@ -303,8 +361,8 @@ export function FormPlayer({ form }: FormPlayerProps) {
       className="min-h-screen flex flex-col"
       style={{ 
         ...themeStyles,
-        background: theme.backgroundColor,
-        fontFamily: theme.fontFamily,
+        background: displayTheme.backgroundColor,
+        fontFamily: questionStyle?.fontFamily || theme.fontFamily,
       } as React.CSSProperties}
     >
       {/* Progress bar */}
@@ -330,18 +388,18 @@ export function FormPlayer({ form }: FormPlayerProps) {
               exit="exit"
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              {/* Question */}
-              <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
+              {/* Check if this is a flow screen (welcome/end) */}
+              {(currentQuestion.type === 'welcome' || currentQuestion.type === 'end') ? (
+                <>
+                  {/* Welcome/End Screen */}
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
                 className="text-3xl font-bold mb-4 leading-tight"
-                style={{ color: theme.textColor }}
+                style={{ color: questionStyle?.textColor || displayTheme.textColor }}
               >
-                {currentQuestion.title || 'Untitled question'}
-                {currentQuestion.required && (
-                  <span style={{ color: theme.primaryColor }} className="ml-1">*</span>
-                )}
+                {currentQuestion.title || (currentQuestion.type === 'welcome' ? 'Welcome' : 'Thank you!')}
               </motion.h2>
 
               {currentQuestion.description && (
@@ -350,24 +408,72 @@ export function FormPlayer({ form }: FormPlayerProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                   className="text-base opacity-80 mb-8 leading-relaxed"
-                  style={{ color: theme.textColor }}
+                  style={{ color: questionStyle?.textColor || displayTheme.textColor }}
                 >
                   {currentQuestion.description}
                 </motion.p>
               )}
 
-              {/* Answer input */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="mt-8"
-              >
+                  {/* Action button */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-8"
+                  >
+                    <Button
+                      onClick={() => goToNext(true)}
+                      disabled={isSubmitting}
+                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
+                      style={{ 
+                        backgroundColor: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor,
+                        color: questionStyle?.buttonTextColor || displayTheme.backgroundColor,
+                      }}
+                    >
+                      {currentQuestion.buttonText || (currentQuestion.type === 'welcome' ? 'Start' : 'Close')}
+                    </Button>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  {/* Regular Question */}
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                  className="text-3xl font-bold mb-4 leading-tight"
+                  style={{ color: questionStyle?.textColor || displayTheme.textColor }}
+                >
+                  {currentQuestion.title || 'Untitled question'}
+                  {currentQuestion.required && (
+                    <span style={{ color: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor }} className="ml-1">*</span>
+                  )}
+                </motion.h2>
+
+                {currentQuestion.description && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-base opacity-80 mb-8 leading-relaxed"
+                    style={{ color: questionStyle?.textColor || displayTheme.textColor }}
+                  >
+                    {currentQuestion.description}
+                  </motion.p>
+                )}
+
+                  {/* Answer input */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="mt-8"
+                  >
                 <QuestionRenderer
                   question={currentQuestion}
                   value={answers[currentQuestion.id]}
                   onChange={(value) => updateAnswer(currentQuestion.id, value)}
-                  theme={theme}
+                  theme={displayTheme}
                   error={errors[currentQuestion.id]}
                   onSubmit={(skipValidation?: boolean) => {
                     if (skipValidation) {
@@ -383,57 +489,61 @@ export function FormPlayer({ form }: FormPlayerProps) {
                     }
                   }}
                 />
-              </motion.div>
+                  </motion.div>
 
-              {/* Error message */}
-              <AnimatePresence>
-                {errors[currentQuestion.id] && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mt-4 text-sm font-medium"
-                    style={{ color: '#EF4444' }}
-                  >
-                    {errors[currentQuestion.id]}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+                  {/* Error message */}
+                  <AnimatePresence>
+                    {errors[currentQuestion.id] && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mt-4 text-sm font-medium"
+                        style={{ color: '#EF4444' }}
+                      >
+                        {errors[currentQuestion.id]}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
 
-              {/* Action buttons */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mt-8"
-              >
-                <Button
-                  onClick={() => goToNext()}
-                  disabled={isSubmitting}
-                  className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
-                  style={{ 
-                    backgroundColor: 'white',
-                    color: theme.primaryColor,
-                  }}
-                >
-                  {isSubmitting ? (
-                    'Submitting...'
-                  ) : isLastQuestion ? (
-                    'Submit'
-                  ) : (
-                    'Continue'
-                  )}
-                </Button>
-                
-                <div className="mt-3 text-center">
-                  <span 
-                    className="text-sm opacity-70"
-                    style={{ color: theme.textColor }}
+                  {/* Action buttons */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-8"
                   >
-                    Or press enter ↵
-                  </span>
-                </div>
-              </motion.div>
+                    <Button
+                      onClick={() => goToNext()}
+                      disabled={isSubmitting}
+                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
+                      style={{ 
+                        backgroundColor: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor,
+                        color: questionStyle?.buttonTextColor || displayTheme.backgroundColor,
+                      }}
+                    >
+                      {isSubmitting ? (
+                        'Submitting...'
+                      ) : currentQuestion.buttonText ? (
+                        currentQuestion.buttonText
+                      ) : isLastQuestion ? (
+                        'Submit'
+                      ) : (
+                        'Continue'
+                      )}
+                    </Button>
+                    
+                    <div className="mt-3 text-center">
+                      <span 
+                        className="text-sm opacity-70"
+                        style={{ color: questionStyle?.textColor || displayTheme.textColor }}
+                      >
+                        Or press enter ↵
+                      </span>
+                    </div>
+                  </motion.div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -448,7 +558,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
             onClick={goToPrevious}
             disabled={isFirstQuestion}
             className="h-10 w-10 p-0"
-            style={{ color: theme.textColor }}
+            style={{ color: questionStyle?.textColor || displayTheme.textColor }}
           >
             <ChevronUp className="w-5 h-5" />
           </Button>
@@ -458,7 +568,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
             onClick={() => goToNext()}
             disabled={isSubmitting}
             className="h-10 w-10 p-0"
-            style={{ color: theme.textColor }}
+            style={{ color: questionStyle?.textColor || displayTheme.textColor }}
           >
             <ChevronDown className="w-5 h-5" />
           </Button>
@@ -470,7 +580,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm opacity-50 hover:opacity-70 transition-opacity"
-          style={{ color: theme.textColor }}
+          style={{ color: questionStyle?.textColor || displayTheme.textColor }}
         >
           Powered by <span className="font-semibold">MamuteForms</span>
         </a>

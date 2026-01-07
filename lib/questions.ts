@@ -173,6 +173,7 @@ export const flowScreens: QuestionTypeInfo[] = [
     defaultConfig: {
       title: 'Welcome',
       description: 'Get started by clicking the button below',
+      buttonText: 'Start',
     },
   },
   {
@@ -203,6 +204,7 @@ export const flowScreens: QuestionTypeInfo[] = [
     defaultConfig: {
       title: 'Thank you!',
       description: 'Your response has been recorded',
+      buttonText: 'Close',
     },
   },
 ]

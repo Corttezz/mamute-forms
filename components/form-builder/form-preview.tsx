@@ -30,18 +30,17 @@ export function FormPreview({
     return {
       fontFamily: style.fontFamily || theme.fontFamily,
       textColor: style.textColor || theme.textColor,
-      buttonBackgroundColor: style.buttonBackgroundColor || theme.primaryColor,
-      buttonTextColor: style.buttonTextColor || theme.backgroundColor,
+      buttonBackgroundColor: style.buttonBackgroundColor || 'white',
+      buttonTextColor: style.buttonTextColor || theme.primaryColor,
       verticalAlignment: style.verticalAlignment || 'left', // Default to left alignment
       theme: theme, // Include full theme for background color
     }
   }
   if (questions.length === 0) {
-    const defaultTheme = themes.minimal
     return (
-      <div className="flex items-center justify-center min-h-[400px] p-8">
+      <div className="flex items-center justify-center min-h-[400px] p-8 bg-white">
         <div className="text-center">
-          <p style={{ color: defaultTheme.textColor }} className="opacity-50">
+          <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Add questions to see a preview
           </p>
         </div>
@@ -55,11 +54,10 @@ export function FormPreview({
     : questions[0]
 
   if (!selectedQuestion) {
-    const defaultTheme = themes.minimal
     return (
-      <div className="flex items-center justify-center min-h-[400px] p-8">
+      <div className="flex items-center justify-center min-h-[400px] p-8 bg-white">
         <div className="text-center">
-          <p style={{ color: defaultTheme.textColor }} className="opacity-50">
+          <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Select a question to preview
           </p>
         </div>
@@ -106,8 +104,8 @@ export function FormPreview({
             className="text-3xl font-bold mb-4 leading-tight"
             style={{ color: qStyle.textColor }}
           >
-            {selectedQuestion.title || 'Untitled question'}
-            {selectedQuestion.required && (
+            {selectedQuestion.title || (selectedQuestion.type === 'welcome' ? 'Welcome' : selectedQuestion.type === 'end' ? 'Thank you!' : 'Untitled question')}
+            {selectedQuestion.required && selectedQuestion.type !== 'welcome' && selectedQuestion.type !== 'end' && (
               <span style={{ color: qStyle.buttonBackgroundColor }} className="ml-1">*</span>
             )}
           </h3>
@@ -122,7 +120,9 @@ export function FormPreview({
           )}
         </div>
 
-        {/* Preview of input types */}
+        {/* Preview of input types - only show for regular questions */}
+        {(selectedQuestion.type !== 'welcome' && selectedQuestion.type !== 'end' && 
+          selectedQuestion.type !== 'loading' && selectedQuestion.type !== 'result') && (
         <div className="mt-6 w-full max-w-xl">
           {(selectedQuestion.type === 'short_text' || selectedQuestion.type === 'email' || 
             selectedQuestion.type === 'phone' || selectedQuestion.type === 'url' || 
@@ -248,25 +248,44 @@ export function FormPreview({
             </div>
           )}
         </div>
+        )}
 
         {/* Button preview */}
         <div className="mt-8 max-w-xl w-full">
           <button
             className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
             style={{
-              backgroundColor: 'white',
-              color: qStyle.theme.primaryColor,
+              backgroundColor: qStyle.buttonBackgroundColor,
+              color: qStyle.buttonTextColor,
             }}
           >
-            Continue
+            {(() => {
+              // Use buttonText if available, otherwise use defaults
+              if (selectedQuestion.buttonText) {
+                return selectedQuestion.buttonText
+              }
+              
+              // Check if it's a welcome or end screen
+              if (selectedQuestion.type === 'welcome') {
+                return 'Start'
+              } else if (selectedQuestion.type === 'end') {
+                return 'Close'
+              } else {
+                // Regular question - check if it's the last one
+                const isLast = questionIndex === questions.length - 1
+                return isLast ? 'Submit' : 'Continue'
+              }
+            })()}
           </button>
           
-          {/* Keyboard hint */}
-          <div className="mt-3 text-center">
-            <span className="text-sm opacity-70" style={{ color: qStyle.textColor }}>
-              Or press enter ↵
-            </span>
-          </div>
+          {/* Keyboard hint - only show for regular questions, not welcome/end screens */}
+          {(selectedQuestion.type !== 'welcome' && selectedQuestion.type !== 'end') && (
+            <div className="mt-3 text-center">
+              <span className="text-sm opacity-70" style={{ color: qStyle.textColor }}>
+                Or press enter ↵
+              </span>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
