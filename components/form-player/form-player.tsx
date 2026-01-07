@@ -120,6 +120,27 @@ export function FormPlayer({ form }: FormPlayerProps) {
     }
   }, [questions, currentIndex])
 
+  const handleSubmit = useCallback(async () => {
+    if (!validateCurrentQuestion()) return
+    
+    setIsSubmitting(true)
+    
+    const insertData = {
+      form_id: form.id,
+      answers: answers,
+    }
+    const { error } = await supabase
+      .from('responses')
+      .insert(insertData as never)
+
+    if (error) {
+      toast.error('Failed to submit response')
+      setIsSubmitting(false)
+    } else {
+      setIsSubmitted(true)
+    }
+  }, [validateCurrentQuestion, form.id, answers, supabase])
+
   const goToNext = useCallback((skipValidation?: boolean) => {
     // Check both the parameter and the ref for skip validation
     const shouldSkip = skipValidation || skipNextValidationRef.current
@@ -148,27 +169,6 @@ export function FormPlayer({ form }: FormPlayerProps) {
     setDirection(-1)
     setCurrentIndex(prev => Math.max(prev - 1, 0))
   }, [])
-
-  const handleSubmit = useCallback(async () => {
-    if (!validateCurrentQuestion()) return
-    
-    setIsSubmitting(true)
-    
-    const insertData = {
-      form_id: form.id,
-      answers: answers,
-    }
-    const { error } = await supabase
-      .from('responses')
-      .insert(insertData as never)
-
-    if (error) {
-      toast.error('Failed to submit response')
-      setIsSubmitting(false)
-    } else {
-      setIsSubmitted(true)
-    }
-  }, [validateCurrentQuestion, form.id, answers, supabase])
 
   const updateAnswer = (questionId: string, value: Json) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }))
