@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Form, QuestionConfig, Json } from '@/lib/database.types'
+import { mockData } from '@/lib/mock-data'
 import { getTheme, getThemeCSSVariables } from '@/lib/themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Progress } from '@/components/ui/progress'
@@ -16,7 +16,6 @@ interface FormPlayerProps {
 }
 
 export function FormPlayer({ form }: FormPlayerProps) {
-  const supabase = createClient()
   const questions = (form.questions as QuestionConfig[]) || []
   const theme = getTheme(form.theme)
   const themeStyles = getThemeCSSVariables(theme)
@@ -125,21 +124,17 @@ export function FormPlayer({ form }: FormPlayerProps) {
     
     setIsSubmitting(true)
     
-    const insertData = {
-      form_id: form.id,
-      answers: answers,
-    }
-    const { error } = await supabase
-      .from('responses')
-      .insert(insertData as never)
-
-    if (error) {
+    try {
+      mockData.responses.create({
+        form_id: form.id,
+        answers: answers,
+      })
+      setIsSubmitted(true)
+    } catch (error) {
       toast.error('Failed to submit response')
       setIsSubmitting(false)
-    } else {
-      setIsSubmitted(true)
     }
-  }, [validateCurrentQuestion, form.id, answers, supabase])
+  }, [validateCurrentQuestion, form.id, answers])
 
   const goToNext = useCallback((skipValidation?: boolean) => {
     // Check both the parameter and the ref for skip validation

@@ -3,23 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { ArrowRight, Sparkles, Zap, Shield, Palette } from 'lucide-react'
 
-async function getUser() {
-  try {
-    // Only import and use Supabase if env vars are set
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return null
-    }
-    const { createClient } = await import('@/lib/supabase/server')
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    return user
-  } catch {
-    return null
-  }
-}
-
 export default async function HomePage() {
-  const user = await getUser()
+  // No authentication needed - frontend only
+  const user = null
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden">

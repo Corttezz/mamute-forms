@@ -149,11 +149,32 @@
     letter-spacing: 0%;
   }
   
-  .text-caption {
-    font-family: var(--font-inter);
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 100%;
-    letter-spacing: 0%;
-  }
-}
+      .text-caption {
+        font-family: var(--font-inter);
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 100%;
+        letter-spacing: 0%;
+      }
+      
+      /* Force fixed width for form builder cards */
+      [data-reorder-item] {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        contain: layout !important;
+      }
+      
+      [data-reorder-item] > * {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+      
+      /* Prevent Reorder.Item from expanding beyond container */
+      aside.w-80 [data-reorder-item] {
+        max-width: 304px !important; /* 320px - 16px padding */
+      }
+    }

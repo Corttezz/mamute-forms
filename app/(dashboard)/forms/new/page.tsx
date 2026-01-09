@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { v4 as uuidv4 } from 'uuid'
-import { FormInsert } from '@/lib/database.types'
+import { mockData, mockUser } from '@/lib/mock-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,37 +10,22 @@ function generateSlug(): string {
 }
 
 export default async function NewFormPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Use mock user if no user
-  const userId = user?.id || 'mock-user-id'
-
   // Create a new form
   const formId = uuidv4()
   const slug = generateSlug()
 
-  const newForm: FormInsert = {
+  const newForm = mockData.forms.create({
     id: formId,
-    user_id: userId,
+    user_id: mockUser.id,
     title: 'Untitled Form',
     slug: slug,
     status: 'draft',
     theme: 'minimal',
     questions: [],
     thank_you_message: 'Thank you for your response!',
-  }
-
-  const { error } = await supabase
-    .from('forms')
-    .insert(newForm as never)
-
-  if (error) {
-    console.error('Error creating form:', error)
-    redirect('/dashboard')
-  }
+  })
 
   // Redirect to the form editor
-  redirect(`/forms/${formId}/edit`)
+  redirect(`/forms/${newForm.id}/edit`)
 }
 

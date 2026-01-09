@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { mockData } from '@/lib/mock-data'
 import {
   Dialog,
   DialogContent,
@@ -25,22 +25,18 @@ export function DeleteFormButton({ formId, formTitle }: DeleteFormButtonProps) {
   const [open, setOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    const { error } = await supabase
-      .from('forms')
-      .delete()
-      .eq('id', formId)
+    const deleted = mockData.forms.delete(formId)
 
-    if (error) {
+    if (!deleted) {
       toast.error('Failed to delete form')
       setIsDeleting(false)
     } else {
       toast.success('Form deleted successfully')
       setOpen(false)
-      router.refresh()
+      router.push('/dashboard')
     }
   }
 

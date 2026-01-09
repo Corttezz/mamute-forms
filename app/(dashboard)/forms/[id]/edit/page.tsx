@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
 import { FormBuilder } from '@/components/form-builder/form-builder'
 import { Form } from '@/lib/database.types'
+import { mockData, mockUser } from '@/lib/mock-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,32 +10,24 @@ interface EditFormPageProps {
 
 export default async function EditFormPage({ params }: EditFormPageProps) {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
 
-  // Create mock form if not found
-  const mockForm: Form = {
-    id: id,
-    user_id: user?.id || 'mock-user-id',
-    title: 'Untitled Form',
-    description: null,
-    slug: 'untitled-form',
-    status: 'draft',
-    theme: 'minimal',
-    questions: [],
-    thank_you_message: 'Thank you for your response!',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+  // Get form from mock data or create new one
+  let form = mockData.forms.getById(id)
+  
+  if (!form) {
+    // Create new form if not found
+    form = mockData.forms.create({
+      id: id,
+      user_id: mockUser.id,
+      title: 'Untitled Form',
+      description: null,
+      slug: `form-${id}`,
+      status: 'draft',
+      theme: 'minimal',
+      questions: [],
+      thank_you_message: 'Thank you for your response!',
+    })
   }
-
-  // Try to get form, but use mock if not found
-  const { data } = await supabase
-    .from('forms')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  const form = (data as Form | null) || mockForm
 
   return <FormBuilder form={form} />
 }

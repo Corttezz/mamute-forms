@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Form, QuestionConfig, FormStatus } from '@/lib/database.types'
+import { mockData } from '@/lib/mock-data'
 import { questionTypes, flowScreens, contentScreens, createDefaultQuestion, getQuestionTypeInfo } from '@/lib/questions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -50,8 +50,6 @@ interface FormBuilderProps {
 }
 
 export function FormBuilder({ form: initialForm }: FormBuilderProps) {
-  const supabase = createClient()
-  
   const [form, setForm] = useState(initialForm)
   const [questions, setQuestions] = useState<QuestionConfig[]>(
     (initialForm.questions as QuestionConfig[]) || []
@@ -67,26 +65,23 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
   const handleSave = useCallback(async () => {
     setIsSaving(true)
-    const updateData = {
+    const updated = mockData.forms.update(form.id, {
       title: form.title,
       description: form.description,
       slug: form.slug,
       questions: questions,
       thank_you_message: form.thank_you_message,
-    }
-    const { error } = await supabase
-      .from('forms')
-      .update(updateData as never)
-      .eq('id', form.id)
+    })
 
-    if (error) {
+    if (!updated) {
       toast.error('Failed to save form')
     } else {
+      setForm(updated)
       toast.success('Form saved')
       setHasUnsavedChanges(false)
     }
     setIsSaving(false)
-  }, [supabase, form, questions])
+  }, [form, questions])
 
   const handlePublish = async () => {
     if (questions.length === 0) {
@@ -97,23 +92,19 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
     setIsSaving(true)
     const newStatus: FormStatus = form.status === 'published' ? 'closed' : 'published'
     
-    const updateData = {
+    const updated = mockData.forms.update(form.id, {
       status: newStatus,
       questions: questions,
       title: form.title,
       description: form.description,
       slug: form.slug,
       thank_you_message: form.thank_you_message,
-    }
-    const { error } = await supabase
-      .from('forms')
-      .update(updateData as never)
-      .eq('id', form.id)
+    })
 
-    if (error) {
+    if (!updated) {
       toast.error('Failed to update form status')
     } else {
-      setForm({ ...form, status: newStatus })
+      setForm(updated)
       toast.success(newStatus === 'published' ? 'Form published!' : 'Form unpublished')
       setShowPublishDialog(false)
       setHasUnsavedChanges(false)
@@ -292,15 +283,16 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       {activeMainTab === 'content' && (
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden">
+        <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden" style={{ width: '320px', maxWidth: '320px' }}>
           <div className="shrink-0 px-6 pt-6 pb-4 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900 ">Screens</h2>
             <p className="text-sm text-slate-600">Manage your form flow</p>
           </div>
 
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <ScrollArea className="flex-1">
-              <div className="p-2">
+          <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full" style={{ width: '100%', maxWidth: '100%' }}>
+            <div className="flex-1 min-h-0 overflow-hidden w-full max-w-full" style={{ width: '100%', maxWidth: '100%' }}>
+              <ScrollArea className="h-full w-full max-w-full" style={{ width: '100%', maxWidth: '100%' }}>
+                <div className="p-2 w-full max-w-full overflow-hidden box-border" style={{ width: '100%', maxWidth: '100%', padding: '8px' }}>
                 {questions.length === 0 ? (
                   <div className="text-center py-8 px-4">
                     <FileText className="w-12 h-12 mx-auto text-slate-300 mb-3" />
@@ -308,79 +300,101 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                     <p className="text-xs text-slate-400 mt-1">Add your first screen to get started</p>
                   </div>
                 ) : (
-                  <Reorder.Group axis="y" values={questions} onReorder={handleReorder}>
-                    <AnimatePresence>
-                      {questions.map((question, index) => (
-                        <Reorder.Item key={question.id} value={question}>
-                          <motion.div
-                            layout
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className={`
-                              group p-3 rounded-lg cursor-pointer mb-2 border transition-all
-                              ${selectedQuestionId === question.id 
-                                ? 'bg-primary/10 border-primary/20' 
-                                : 'bg-white border-slate-100 hover:border-slate-200'
-                              }
-                            `}
-                            onClick={() => setSelectedQuestionId(question.id)}
+                  <div className="w-full max-w-full overflow-hidden" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+                    <Reorder.Group axis="y" values={questions} onReorder={handleReorder} className="w-full" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+                      <AnimatePresence>
+                        {questions.map((question, index) => (
+                          <Reorder.Item 
+                            key={question.id}
+                            value={question} 
+                            className="w-full"
+                            data-reorder-item
+                            style={{ 
+                              width: '100%', 
+                              maxWidth: '100%', 
+                              boxSizing: 'border-box',
+                              overflow: 'hidden',
+                              contain: 'layout'
+                            } as React.CSSProperties}
                           >
-                            <div className="flex items-start gap-2">
-                              <div className="mt-1 cursor-grab active:cursor-grabbing">
-                                <GripVertical className="w-4 h-4 text-slate-300" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-xs font-medium text-slate-400">
-                                    {index + 1}
-                                  </span>
-                                  <span className="text-xs text-slate-400 capitalize">
-                                    {question.type.replace('_', ' ')}
-                                  </span>
-                                  {question.required && (
-                                    <span className="text-xs text-red-500">*</span>
-                                  )}
+                            <motion.div
+                              layout={false}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              className={`
+                                group p-3 rounded-lg cursor-pointer mb-2 border transition-all w-full overflow-hidden
+                                ${selectedQuestionId === question.id 
+                                  ? 'bg-primary/10 border-primary/20' 
+                                  : 'bg-white border-slate-100 hover:border-slate-200'
+                                }
+                              `}
+                              style={{ 
+                                width: '100%', 
+                                maxWidth: '100%', 
+                                boxSizing: 'border-box', 
+                                overflow: 'hidden',
+                                wordBreak: 'break-word'
+                              } as React.CSSProperties}
+                              onClick={() => setSelectedQuestionId(question.id)}
+                            >
+                                <div className="flex items-start gap-2 w-full min-w-0" style={{ width: '100%', maxWidth: '100%' }}>
+                                  <div className="mt-1 cursor-grab active:cursor-grabbing flex-shrink-0">
+                                    <GripVertical className="w-4 h-4 text-slate-300" />
+                                  </div>
+                                  <div className="flex-1 min-w-0 overflow-hidden" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="text-xs font-medium text-slate-400 flex-shrink-0">
+                                        {index + 1}
+                                      </span>
+                                      <span className="text-xs text-slate-400 capitalize flex-shrink-0">
+                                        {question.type.replace('_', ' ')}
+                                      </span>
+                                      {question.required && (
+                                        <span className="text-xs text-red-500 flex-shrink-0">*</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2 min-w-0" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                                      {(() => {
+                                        const typeInfo = getQuestionTypeInfo(question.type)
+                                        const Icon = typeInfo?.icon
+                                        if (Icon) {
+                                          return <Icon className="w-4 h-4 text-slate-900 flex-shrink-0" />
+                                        }
+                                        return null
+                                      })()}
+                                      <p className="text-sm font-medium text-slate-900 truncate min-w-0 flex-1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
+                                        {question.title || 'Untitled question'}
+                                      </p>
+                                    </div>
+                                    {question.description && (
+                                      <p className="text-xs text-slate-500 truncate mt-0.5 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
+                                        {question.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 flex-shrink-0"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      deleteQuestion(question.id)
+                                    }}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+                                  </Button>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  {(() => {
-                                    const typeInfo = getQuestionTypeInfo(question.type)
-                                    const Icon = typeInfo?.icon
-                                    if (Icon) {
-                                      return <Icon className="w-4 h-4 text-slate-900 flex-shrink-0" />
-                                    }
-                                    return null
-                                  })()}
-                                  <p className="text-sm font-medium text-slate-900 truncate">
-                                    {question.title || 'Untitled question'}
-                                  </p>
-                                </div>
-                                {question.description && (
-                                  <p className="text-xs text-slate-500 truncate mt-0.5">
-                                    {question.description}
-                                  </p>
-                                )}
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  deleteQuestion(question.id)
-                                }}
-                              >
-                                <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
-                              </Button>
-                            </div>
-                          </motion.div>
-                        </Reorder.Item>
-                      ))}
-                    </AnimatePresence>
-                  </Reorder.Group>
+                              </motion.div>
+                            </Reorder.Item>
+                        ))}
+                      </AnimatePresence>
+                    </Reorder.Group>
+                  </div>
                 )}
-              </div>
-            </ScrollArea>
+                </div>
+              </ScrollArea>
+            </div>
             
             <div className="shrink-0 px-4 py-4 border-t border-slate-200">
               <Button 
@@ -639,7 +653,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
       {/* Publish Dialog */}
       <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {form.status === 'published' ? 'Unpublish form?' : 'Publish form?'}
@@ -653,7 +667,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
           </DialogHeader>
           {form.status !== 'published' && (
             <div className="p-3 bg-slate-50 rounded-lg">
-              <code className="text-sm text-primary">
+              <code className="text-sm text-primary break-all">
                 {typeof window !== 'undefined' ? window.location.origin : ''}/f/{form.slug}
               </code>
             </div>
