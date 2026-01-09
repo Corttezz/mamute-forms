@@ -128,11 +128,13 @@ export const questionTypes: QuestionTypeInfo[] = [
   {
     type: 'slider',
     label: 'Level / Slider',
-    description: 'Numeric slider input.',
+    description: 'Interactive slider with min/max values and labels.',
     icon: Sliders,
     defaultConfig: {
       minValue: 0,
       maxValue: 100,
+      placeholder: '50', // Default value
+      options: ['0', '100'], // Min and max labels
     },
   },
   {
@@ -229,26 +231,32 @@ export const contentScreens: QuestionTypeInfo[] = [
     defaultConfig: {
       title: 'What our users say',
       description: '',
+      options: ['John Doe|5|Great product!|JD', 'Jane Smith|5|Love it!|JS'], // Format: name|rating|comment|initials
     },
   },
   {
     type: 'media',
     label: 'Media',
-    description: 'Image or video content screen.',
+    description: 'Image or video content screen with caption.',
     icon: Image,
     defaultConfig: {
       title: 'Media',
       description: '',
+      placeholder: 'https://example.com/image.jpg', // Media URL
+      options: ['image'], // Media type: 'image' or 'video'
     },
   },
   {
     type: 'timer',
     label: 'Timer',
-    description: 'Countdown or timed message screen.',
+    description: 'Countdown timer with configurable duration and actions.',
     icon: Timer,
     defaultConfig: {
-      title: 'Timer',
+      title: 'Time remaining',
       description: '',
+      minValue: 60, // Duration in seconds
+      placeholder: 'Time is up!', // Message when timer ends
+      options: ['auto_advance'], // Action: 'auto_advance' or 'show_message'
     },
   },
 ]

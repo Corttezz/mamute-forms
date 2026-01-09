@@ -372,7 +372,7 @@ export default function DashboardPage() {
                   Need help getting started?
                 </h3>
                 <p className="text-[14px] text-white/80 mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
-                  Check out our comprehensive guides and tutorials to make the most of MamuteForms.
+                  Check out our comprehensive guides and tutorials to make the most of FoxForm.
                 </p>
                 <div className="flex items-center gap-3">
                   <Button

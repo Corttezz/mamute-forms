@@ -445,6 +445,159 @@ export function QuestionRenderer({
         />
       )
 
+    case 'slider':
+      const sliderValue = typeof value === 'number' ? value : parseInt(question.placeholder || '50') || 50
+      const minValue = question.minValue || 0
+      const maxValue = question.maxValue || 100
+      return (
+        <div className="space-y-4">
+          <div className="flex justify-between text-sm opacity-70" style={{ color: theme.textColor }}>
+            <span>{question.options?.[0] || minValue}</span>
+            <span className="text-2xl font-bold opacity-100">{sliderValue}</span>
+            <span>{question.options?.[1] || maxValue}</span>
+          </div>
+          <input
+            type="range"
+            min={minValue}
+            max={maxValue}
+            value={sliderValue}
+            onChange={(e) => {
+              const newValue = parseInt(e.target.value)
+              onChange(newValue)
+              onClearError?.()
+            }}
+            className="w-full h-3 bg-white/20 rounded-lg appearance-none cursor-pointer"
+            style={{
+              accentColor: theme.primaryColor,
+            }}
+          />
+        </div>
+      )
+
+    case 'testimonials':
+      return (
+        <div className="space-y-4">
+          {(question.options || []).map((testimonial, i) => {
+            const parts = testimonial.split('|')
+            const name = parts[0] || 'Anonymous'
+            const rating = parseInt(parts[1] || '5')
+            const comment = parts[2] || 'Great experience!'
+            const initials = parts[3] || name.slice(0, 2).toUpperCase()
+            
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-xl border-2 bg-white/5 backdrop-blur-sm"
+                style={{ 
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                  color: theme.textColor 
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-sm font-semibold" style={{ color: theme.textColor }}>
+                    {initials}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-base">{name}</span>
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <Star
+                            key={j}
+                            className="w-4 h-4"
+                            style={{ 
+                              color: j < rating ? '#FFD700' : 'rgba(255, 255, 255, 0.3)',
+                              fill: j < rating ? '#FFD700' : 'none'
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm opacity-80 leading-relaxed">{comment}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      )
+
+    case 'media':
+      const mediaType = question.options?.[0] || 'image'
+      const mediaUrl = question.placeholder || ''
+      return (
+        <div className="space-y-4">
+          <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}>
+            {mediaUrl ? (
+              mediaType === 'video' ? (
+                <video
+                  src={mediaUrl}
+                  controls
+                  className="w-full aspect-video object-cover"
+                />
+              ) : (
+                <img
+                  src={mediaUrl}
+                  alt={question.title || 'Media'}
+                  className="w-full aspect-video object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none'
+                  }}
+                />
+              )
+            ) : (
+              <div className="aspect-video bg-white/10 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-sm opacity-70" style={{ color: theme.textColor }}>
+                    No media URL provided
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          {question.description && (
+            <p className="text-sm opacity-70 text-center" style={{ color: theme.textColor }}>
+              {question.description}
+            </p>
+          )}
+        </div>
+      )
+
+    case 'timer':
+      const timerValue = typeof value === 'number' ? value : (question.minValue || 60)
+      const minutes = Math.floor(timerValue / 60)
+      const seconds = timerValue % 60
+      const isTimerEnded = timerValue <= 0
+      
+      return (
+        <div className="text-center space-y-6">
+          <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-4" style={{ borderColor: theme.primaryColor }}>
+            <div className="text-center">
+              {isTimerEnded ? (
+                <div className="text-lg font-semibold" style={{ color: theme.textColor }}>
+                  {question.placeholder || 'Time is up!'}
+                </div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold" style={{ color: theme.textColor }}>
+                    {minutes}:{seconds < 10 ? '0' : ''}{seconds}
+                  </div>
+                  <div className="text-xs opacity-70 mt-1" style={{ color: theme.textColor }}>remaining</div>
+                </>
+              )}
+            </div>
+          </div>
+          {question.description && !isTimerEnded && (
+            <p className="text-base opacity-80" style={{ color: theme.textColor }}>
+              {question.description}
+            </p>
+          )}
+        </div>
+      )
+
     default:
       return (
         <p style={{ color: theme.textColor }} className="opacity-50">

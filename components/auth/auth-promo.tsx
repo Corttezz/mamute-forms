@@ -63,7 +63,7 @@ export function AuthPromo() {
           <Quote className="w-5 h-5 text-white/60 flex-shrink-0 mt-1" />
           <div className="flex-1">
             <p className="text-[14px] text-white/90 italic mb-3" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
-              &quot;MamuteForms transformed how we collect feedback. Fast, intuitive, and powerful!&quot;
+              &quot;FoxForm transformed how we collect feedback. Fast, intuitive, and powerful!&quot;
             </p>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">

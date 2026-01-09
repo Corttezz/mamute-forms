@@ -321,6 +321,257 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
         </div>
       )}
 
+      {question.type === 'slider' && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="slider-min" className="text-sm font-medium">Min value</Label>
+              <Input
+                id="slider-min"
+                type="number"
+                value={question.minValue || 0}
+                onChange={(e) => onUpdate({ minValue: parseInt(e.target.value) || 0 })}
+                className="mt-2"
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="slider-max" className="text-sm font-medium">Max value</Label>
+              <Input
+                id="slider-max"
+                type="number"
+                value={question.maxValue || 100}
+                onChange={(e) => onUpdate({ maxValue: parseInt(e.target.value) || 100 })}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="slider-default" className="text-sm font-medium">Default value</Label>
+            <Input
+              id="slider-default"
+              type="number"
+              value={question.placeholder || '50'}
+              onChange={(e) => onUpdate({ placeholder: e.target.value })}
+              min={question.minValue || 0}
+              max={question.maxValue || 100}
+              className="mt-2"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="slider-min-label" className="text-sm font-medium">Min label</Label>
+              <Input
+                id="slider-min-label"
+                type="text"
+                value={question.options?.[0] || ''}
+                onChange={(e) => {
+                  const options = [...(question.options || [])]
+                  options[0] = e.target.value
+                  if (!options[1]) options[1] = ''
+                  onUpdate({ options })
+                }}
+                placeholder="Left label"
+                className="mt-2"
+              />
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="slider-max-label" className="text-sm font-medium">Max label</Label>
+              <Input
+                id="slider-max-label"
+                type="text"
+                value={question.options?.[1] || ''}
+                onChange={(e) => {
+                  const options = [...(question.options || [])]
+                  if (!options[0]) options[0] = ''
+                  options[1] = e.target.value
+                  onUpdate({ options })
+                }}
+                placeholder="Right label"
+                className="mt-2"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {question.type === 'testimonials' && (
+        <div className="space-y-4">
+          <Label className="text-sm font-medium">Testimonials</Label>
+          <p className="text-xs text-slate-500 mb-3">Format: Name|Rating(1-5)|Comment|Initials</p>
+          <div className="space-y-3">
+            {(question.options || []).map((testimonial, index) => {
+              const parts = testimonial.split('|')
+              return (
+                <div key={index} className="p-3 border border-slate-200 rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Testimonial {index + 1}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const options = (question.options || []).filter((_, i) => i !== index)
+                        onUpdate({ options })
+                      }}
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="w-3 h-3 text-slate-400" />
+                    </Button>
+                  </div>
+                  <Input
+                    placeholder="Name"
+                    value={parts[0] || ''}
+                    onChange={(e) => {
+                      const options = [...(question.options || [])]
+                      const newParts = [...parts]
+                      newParts[0] = e.target.value
+                      options[index] = newParts.join('|')
+                      onUpdate({ options })
+                    }}
+                    className="text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Rating (1-5)"
+                      min={1}
+                      max={5}
+                      value={parts[1] || ''}
+                      onChange={(e) => {
+                        const options = [...(question.options || [])]
+                        const newParts = [...parts]
+                        newParts[1] = e.target.value
+                        options[index] = newParts.join('|')
+                        onUpdate({ options })
+                      }}
+                      className="text-sm flex-1"
+                    />
+                    <Input
+                      placeholder="Initials"
+                      value={parts[3] || ''}
+                      onChange={(e) => {
+                        const options = [...(question.options || [])]
+                        const newParts = [...parts]
+                        newParts[3] = e.target.value
+                        options[index] = newParts.join('|')
+                        onUpdate({ options })
+                      }}
+                      className="text-sm w-20"
+                    />
+                  </div>
+                  <Textarea
+                    placeholder="Comment"
+                    value={parts[2] || ''}
+                    onChange={(e) => {
+                      const options = [...(question.options || [])]
+                      const newParts = [...parts]
+                      newParts[2] = e.target.value
+                      options[index] = newParts.join('|')
+                      onUpdate({ options })
+                    }}
+                    className="text-sm min-h-[60px]"
+                  />
+                </div>
+              )
+            })}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const options = [...(question.options || []), 'New User|5|Great experience!|NU']
+              onUpdate({ options })
+            }}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add testimonial
+          </Button>
+        </div>
+      )}
+
+      {question.type === 'media' && (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="media-type" className="text-sm font-medium mb-2 block">Media type</Label>
+            <Select
+              value={question.options?.[0] || 'image'}
+              onValueChange={(value) => {
+                const options = [value]
+                onUpdate({ options })
+              }}
+            >
+              <SelectTrigger id="media-type" className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="image">Image</SelectItem>
+                <SelectItem value="video">Video</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="media-url" className="text-sm font-medium">Media URL</Label>
+            <Input
+              id="media-url"
+              type="url"
+              value={question.placeholder || ''}
+              onChange={(e) => onUpdate({ placeholder: e.target.value })}
+              placeholder="https://example.com/image.jpg"
+              className="mt-2"
+            />
+            <p className="text-xs text-slate-500 mt-1">Enter the URL of the image or video</p>
+          </div>
+        </div>
+      )}
+
+      {question.type === 'timer' && (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="timer-duration" className="text-sm font-medium">Duration (seconds)</Label>
+            <Input
+              id="timer-duration"
+              type="number"
+              value={question.minValue || 60}
+              onChange={(e) => onUpdate({ minValue: parseInt(e.target.value) || 60 })}
+              min={1}
+              max={3600}
+              className="mt-2"
+            />
+            <p className="text-xs text-slate-500 mt-1">Timer will countdown from this value</p>
+          </div>
+          <div>
+            <Label htmlFor="timer-message" className="text-sm font-medium">End message</Label>
+            <Input
+              id="timer-message"
+              type="text"
+              value={question.placeholder || ''}
+              onChange={(e) => onUpdate({ placeholder: e.target.value })}
+              placeholder="Time is up!"
+              className="mt-2"
+            />
+            <p className="text-xs text-slate-500 mt-1">Message shown when timer reaches zero</p>
+          </div>
+          <div>
+            <Label htmlFor="timer-action" className="text-sm font-medium mb-2 block">Action when timer ends</Label>
+            <Select
+              value={question.options?.[0] || 'auto_advance'}
+              onValueChange={(value) => {
+                const options = [value]
+                onUpdate({ options })
+              }}
+            >
+              <SelectTrigger id="timer-action" className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto_advance">Auto advance to next screen</SelectItem>
+                <SelectItem value="show_message">Show message only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
       {/* Required toggle (only for questions, not flow screens) */}
       {!isFlowScreen && (
         <>

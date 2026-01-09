@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MamuteForms - Create Beautiful Forms",
+  title: "FoxForm - Create Beautiful Forms",
   description: "Build stunning, TypeForm-style forms in minutes. Free and open source.",
 };
 

@@ -4,7 +4,7 @@ import { QuestionConfig, ThemePreset } from '@/lib/database.types'
 import { ThemeConfig } from '@/lib/database.types'
 import { themes, getTheme } from '@/lib/themes'
 import { motion } from 'framer-motion'
-import { Star, Check } from 'lucide-react'
+import { Star, Check, Image } from 'lucide-react'
 
 interface FormPreviewProps {
   questions: QuestionConfig[]
@@ -38,7 +38,7 @@ export function FormPreview({
   }
   if (questions.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] p-8 bg-white">
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
           <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Add questions to see a preview
@@ -55,7 +55,7 @@ export function FormPreview({
 
   if (!selectedQuestion) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] p-8 bg-white">
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
           <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Select a question to preview
@@ -72,9 +72,10 @@ export function FormPreview({
 
   return (
     <div 
-      className="h-full flex flex-col"
+      className="h-full flex flex-col min-h-[calc(100vh-200px)]"
       style={{ 
         background: qStyle.theme.backgroundColor,
+        minHeight: 'calc(100vh - 200px)',
       } as React.CSSProperties}
     >
       <motion.div
@@ -87,9 +88,10 @@ export function FormPreview({
         `}
         style={{ 
           fontFamily: qStyle.fontFamily,
+          minHeight: 'calc(100vh - 200px)',
         } as React.CSSProperties}
       >
-        <div className="mb-8 max-w-xl w-full">
+        <div className="mb-8 w-full">
           {/* Progress bar */}
           <div className="h-1 bg-white/20 rounded-full mb-12 overflow-hidden">
             <div 
@@ -99,7 +101,7 @@ export function FormPreview({
           </div>
         </div>
         
-        <div className="max-w-xl w-full">
+        <div className="w-full">
           <h3 
             className="text-3xl font-bold mb-4 leading-tight"
             style={{ color: qStyle.textColor }}
@@ -120,10 +122,136 @@ export function FormPreview({
           )}
         </div>
 
+        {/* Content Screens Preview */}
+        {selectedQuestion.type === 'slider' && (
+          <div className="mt-6 w-full">
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm opacity-70" style={{ color: qStyle.textColor }}>
+                <span>{selectedQuestion.options?.[0] || selectedQuestion.minValue || 0}</span>
+                <span className="text-lg font-semibold opacity-100">{selectedQuestion.placeholder || '50'}</span>
+                <span>{selectedQuestion.options?.[1] || selectedQuestion.maxValue || 100}</span>
+              </div>
+              <div className="relative">
+                <input
+                  type="range"
+                  min={selectedQuestion.minValue || 0}
+                  max={selectedQuestion.maxValue || 100}
+                  value={selectedQuestion.placeholder || '50'}
+                  className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    accentColor: qStyle.buttonBackgroundColor || qStyle.theme.primaryColor,
+                  }}
+                  readOnly
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedQuestion.type === 'testimonials' && (
+          <div className="mt-6 w-full space-y-4">
+            {(selectedQuestion.options || []).map((testimonial, i) => {
+              const parts = testimonial.split('|')
+              const name = parts[0] || 'Anonymous'
+              const rating = parseInt(parts[1] || '5')
+              const comment = parts[2] || 'Great experience!'
+              const initials = parts[3] || name.slice(0, 2).toUpperCase()
+              
+              return (
+                <div 
+                  key={i}
+                  className="p-6 rounded-xl border-2 bg-white/5 backdrop-blur-sm"
+                  style={{ 
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    color: qStyle.textColor 
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-sm font-semibold" style={{ color: qStyle.textColor }}>
+                      {initials}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-base">{name}</span>
+                        <div className="flex gap-1">
+                          {Array.from({ length: 5 }).map((_, j) => (
+                            <Star
+                              key={j}
+                              className="w-4 h-4"
+                              style={{ 
+                                color: j < rating ? '#FFD700' : 'rgba(255, 255, 255, 0.3)',
+                                fill: j < rating ? '#FFD700' : 'none'
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm opacity-80 leading-relaxed">{comment}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {selectedQuestion.type === 'media' && (
+          <div className="mt-6 w-full">
+            <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}>
+              {selectedQuestion.options?.[0] === 'video' ? (
+                <div className="aspect-video bg-white/10 flex items-center justify-center">
+                  <div className="text-center">
+                    <Image className="w-16 h-16 mx-auto mb-2 opacity-50" style={{ color: qStyle.textColor }} />
+                    <p className="text-sm opacity-70" style={{ color: qStyle.textColor }}>
+                      {selectedQuestion.placeholder || 'Video URL'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="aspect-video bg-white/10 flex items-center justify-center">
+                  <div className="text-center">
+                    <Image className="w-16 h-16 mx-auto mb-2 opacity-50" style={{ color: qStyle.textColor }} />
+                    <p className="text-sm opacity-70" style={{ color: qStyle.textColor }}>
+                      {selectedQuestion.placeholder || 'Image URL'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            {selectedQuestion.description && (
+              <p className="text-sm opacity-70 mt-3 text-center" style={{ color: qStyle.textColor }}>
+                {selectedQuestion.description}
+              </p>
+            )}
+          </div>
+        )}
+
+        {selectedQuestion.type === 'timer' && (
+          <div className="mt-6 w-full">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-4" style={{ borderColor: qStyle.buttonBackgroundColor || qStyle.theme.primaryColor }}>
+                <div className="text-center">
+                  <div className="text-4xl font-bold" style={{ color: qStyle.textColor }}>
+                    {Math.floor((selectedQuestion.minValue || 60) / 60)}:{(selectedQuestion.minValue || 60) % 60 < 10 ? '0' : ''}{(selectedQuestion.minValue || 60) % 60}
+                  </div>
+                  <div className="text-xs opacity-70 mt-1" style={{ color: qStyle.textColor }}>remaining</div>
+                </div>
+              </div>
+              {selectedQuestion.description && (
+                <p className="text-base opacity-80" style={{ color: qStyle.textColor }}>
+                  {selectedQuestion.description}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Preview of input types - only show for regular questions */}
         {(selectedQuestion.type !== 'welcome' && selectedQuestion.type !== 'end' && 
-          selectedQuestion.type !== 'loading' && selectedQuestion.type !== 'result') && (
-        <div className="mt-6 w-full max-w-xl">
+          selectedQuestion.type !== 'loading' && selectedQuestion.type !== 'result' &&
+          selectedQuestion.type !== 'slider' && selectedQuestion.type !== 'testimonials' &&
+          selectedQuestion.type !== 'media' && selectedQuestion.type !== 'timer') && (
+        <div className="mt-6 w-full">
           {(selectedQuestion.type === 'short_text' || selectedQuestion.type === 'email' || 
             selectedQuestion.type === 'phone' || selectedQuestion.type === 'url' || 
             selectedQuestion.type === 'number') && (
@@ -251,7 +379,7 @@ export function FormPreview({
         )}
 
         {/* Button preview */}
-        <div className="mt-8 max-w-xl w-full">
+        <div className="mt-8 w-full">
           <button
             className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
             style={{

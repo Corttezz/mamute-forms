@@ -2,32 +2,29 @@
 
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface LogoProps {
   href?: string
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  variant?: 'black' | 'white'
 }
 
-export function Logo({ href = '/', size = 'md', className }: LogoProps) {
+export function Logo({ href = '/', size = 'md', className, variant = 'black' }: LogoProps) {
+  const logoSrc = variant === 'white' 
+    ? '/logo-fox-form-text-white.png'
+    : '/fox-form-logo-text-black.png'
+  
   const content = (
-    <span
-      className={cn(
-        'text-[24px] font-bold leading-[100%] tracking-[0%]',
-        'transition-colors',
-        className
-      )}
-      style={{
-        fontFamily: 'Inter, sans-serif',
-        fontWeight: 700,
-        fontSize: '24px',
-        lineHeight: '100%',
-        letterSpacing: '0%',
-        color: '#000000',
-      }}
-    >
-      MamuteForms
-    </span>
+    <Image
+      src={logoSrc}
+      alt="FoxForm"
+      width={size === 'sm' ? 120 : size === 'lg' ? 180 : 150}
+      height={size === 'sm' ? 30 : size === 'lg' ? 45 : 38}
+      className={cn('object-contain', className)}
+      priority
+    />
   )
 
   if (href) {

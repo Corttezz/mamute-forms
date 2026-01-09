@@ -413,14 +413,14 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
         {/* Preview / Editor area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Preview */}
-          <div className="flex-1 overflow-auto bg-slate-100 p-8">
-            <div className="max-w-2xl mx-auto">
-              <div className="rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-4">
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-200">
+          <div className="flex-1 overflow-auto bg-slate-100 p-8 flex flex-col">
+            <div className="max-w-2xl mx-auto flex-1 flex flex-col min-h-0 w-full">
+              <div className="rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-4 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-200 flex-shrink-0">
                   <Eye className="w-4 h-4 text-slate-500" />
                   <span className="text-sm font-medium text-slate-600">Preview</span>
                 </div>
-                <div>
+                <div className="flex-1 min-h-0 overflow-hidden">
                   <FormPreview 
                     questions={questions}
                     selectedQuestionId={selectedQuestionId}
@@ -430,7 +430,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               </div>
               
               {/* Upgrade Banner */}
-              <div className="max-w-2xl mx-auto flex justify-center mt-4">
+              <div className="max-w-5xl mx-auto flex justify-center mt-4 flex-shrink-0">
                 <UpgradeBanner />
               </div>
             </div>
@@ -645,7 +645,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               <span>Selection adds screen immediately</span>
             </div>
             <div className="text-xs text-slate-400 font-medium">
-              MamuteForms Builder
+              FoxForm Builder
             </div>
           </div>
         </DialogContent>

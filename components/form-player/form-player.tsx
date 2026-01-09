@@ -39,6 +39,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [direction, setDirection] = useState(0)
+  const [timerSeconds, setTimerSeconds] = useState<number | null>(null)
   
   const containerRef = useRef<HTMLDivElement>(null)
   const skipNextValidationRef = useRef(false)
@@ -208,6 +209,33 @@ export function FormPlayer({ form }: FormPlayerProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [currentQuestion, goToNext, goToPrevious, isSubmitted, isSubmitting])
 
+  // Timer countdown logic
+  useEffect(() => {
+    if (currentQuestion?.type === 'timer') {
+      const duration = currentQuestion.minValue || 60
+      setTimerSeconds(duration)
+      
+      const interval = setInterval(() => {
+        setTimerSeconds((prev) => {
+          if (prev === null || prev <= 1) {
+            clearInterval(interval)
+            // Timer ended - handle action
+            const action = currentQuestion.options?.[0] || 'auto_advance'
+            if (action === 'auto_advance') {
+              setTimeout(() => goToNext(true), 500)
+            }
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+      
+      return () => clearInterval(interval)
+    } else {
+      setTimerSeconds(null)
+    }
+  }, [currentQuestion, goToNext])
+
   // Auto-advance logic
   useEffect(() => {
     if (isSubmitted || isSubmitting) return
@@ -295,7 +323,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
             Your response has been recorded.
           </p>
           
-          {/* MamuteForms branding */}
+          {/* FoxForm branding */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -310,7 +338,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
               style={{ color: questionStyle?.textColor || displayTheme.textColor }}
             >
               <span>Made with</span>
-              <span className="font-semibold">MamuteForms</span>
+              <span className="font-semibold">FoxForm</span>
             </a>
           </motion.div>
         </motion.div>
@@ -431,7 +459,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
                 </>
               ) : (
                 <>
-                  {/* Regular Question */}
+                  {/* Regular Question or Content Screen */}
                   <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -440,7 +468,8 @@ export function FormPlayer({ form }: FormPlayerProps) {
                   style={{ color: questionStyle?.textColor || displayTheme.textColor }}
                 >
                   {currentQuestion.title || 'Untitled question'}
-                  {currentQuestion.required && (
+                  {currentQuestion.required && currentQuestion.type !== 'testimonials' && 
+                   currentQuestion.type !== 'media' && currentQuestion.type !== 'timer' && (
                     <span style={{ color: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor }} className="ml-1">*</span>
                   )}
                 </motion.h2>
@@ -457,7 +486,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
                   </motion.p>
                 )}
 
-                  {/* Answer input */}
+                  {/* Answer input or Content */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -466,8 +495,12 @@ export function FormPlayer({ form }: FormPlayerProps) {
                   >
                 <QuestionRenderer
                   question={currentQuestion}
-                  value={answers[currentQuestion.id]}
-                  onChange={(value) => updateAnswer(currentQuestion.id, value)}
+                  value={currentQuestion.type === 'timer' ? timerSeconds : answers[currentQuestion.id]}
+                  onChange={(value) => {
+                    if (currentQuestion.type !== 'timer') {
+                      updateAnswer(currentQuestion.id, value)
+                    }
+                  }}
                   theme={displayTheme}
                   error={errors[currentQuestion.id]}
                   onSubmit={(skipValidation?: boolean) => {
@@ -501,7 +534,9 @@ export function FormPlayer({ form }: FormPlayerProps) {
                     )}
                   </AnimatePresence>
 
-                  {/* Action buttons */}
+                  {/* Action buttons - hide for content screens that don't need buttons */}
+                  {(currentQuestion.type !== 'testimonials' && currentQuestion.type !== 'media' && 
+                    currentQuestion.type !== 'timer' && currentQuestion.type !== 'alert') && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -537,6 +572,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
                       </span>
                     </div>
                   </motion.div>
+                  )}
                 </>
               )}
             </motion.div>
@@ -569,7 +605,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
           </Button>
         </div>
 
-        {/* MamuteForms branding */}
+        {/* FoxForm branding */}
         <a 
           href="/"
           target="_blank"
@@ -577,7 +613,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
           className="text-sm opacity-50 hover:opacity-70 transition-opacity"
           style={{ color: questionStyle?.textColor || displayTheme.textColor }}
         >
-          Powered by <span className="font-semibold">MamuteForms</span>
+          Powered by <span className="font-semibold">FoxForm</span>
         </a>
       </footer>
     </div>

@@ -52,11 +52,7 @@ export function Sidebar({ user }: SidebarProps) {
     <div className="w-64 bg-white min-h-screen flex flex-col fixed left-0 top-0 bottom-0 z-10 border-r border-slate-200">
       {/* Logo */}
       <div className="px-6 pt-5 pb-6 border-b border-slate-200">
-        <Link href="/dashboard" className="block">
-          <div className="text-[20px] font-bold leading-[100%] tracking-[0%] text-[#000000] hover:text-[#000000]/80 transition-colors" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '20px', lineHeight: '100%', letterSpacing: '0%', color: '#000000' }}>
-            MamuteForms
-          </div>
-        </Link>
+        <Logo href="/dashboard" size="sm" />
       </div>
 
       {/* Navigation */}
