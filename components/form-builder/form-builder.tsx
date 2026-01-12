@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Form, QuestionConfig, FormStatus } from '@/lib/database.types'
 import { mockData } from '@/lib/mock-data'
 import { questionTypes, flowScreens, contentScreens, createDefaultQuestion, getQuestionTypeInfo } from '@/lib/questions'
@@ -39,11 +39,15 @@ import {
   Home,
   ArrowRight,
   Info,
+  Share2,
+  Check,
+  Link2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { QuestionEditor } from './question-editor'
 import { FormPreview } from './form-preview'
 import { UpgradeBanner } from '@/components/upgrade/upgrade-banner'
+import { encodeFormToURL } from '@/lib/form-serializer'
 
 interface FormBuilderProps {
   form: Form
@@ -60,8 +64,30 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
   const [showAddQuestion, setShowAddQuestion] = useState(false)
   const [activeMainTab, setActiveMainTab] = useState('content')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null)
+  const [showShareDialog, setShowShareDialog] = useState(false)
 
   const selectedQuestion = questions.find(q => q.id === selectedQuestionId)
+
+  // Ensure form exists in client-side mockData storage
+  useEffect(() => {
+    // Check if form exists in client storage, if not, create it
+    const existingForm = mockData.forms.getById(initialForm.id)
+    if (!existingForm) {
+      mockData.forms.create(initialForm)
+    }
+  }, [initialForm])
+
+  // Generate shareable link with form data embedded in URL
+  const generateShareLink = useCallback(() => {
+    const formWithQuestions: Form = {
+      ...form,
+      questions: questions,
+    }
+    const encoded = encodeFormToURL(formWithQuestions)
+    const baseURL = typeof window !== 'undefined' ? window.location.origin : ''
+    return `${baseURL}/s/${encoded}`
+  }, [form, questions])
 
   const handleSave = useCallback(async () => {
     setIsSaving(true)
@@ -105,15 +131,43 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       toast.error('Failed to update form status')
     } else {
       setForm(updated)
-      toast.success(newStatus === 'published' ? 'Form published!' : 'Form unpublished')
-      setShowPublishDialog(false)
+      
+      if (newStatus === 'published') {
+        // Generate shareable link
+        const link = generateShareLink()
+        setGeneratedLink(link)
+        setShowPublishDialog(false)
+        setShowShareDialog(true)
+        toast.success('Form published!')
+      } else {
+        toast.success('Form unpublished')
+        setShowPublishDialog(false)
+      }
       setHasUnsavedChanges(false)
     }
     setIsSaving(false)
   }
 
+  const handlePreview = () => {
+    const link = generateShareLink()
+    window.open(link, '_blank')
+  }
+
+  const copyShareLink = () => {
+    const link = generatedLink || generateShareLink()
+    navigator.clipboard.writeText(link)
+    toast.success('Link copied to clipboard!')
+  }
+
   const addQuestion = (type: QuestionConfig['type']) => {
     const newQuestion = createDefaultQuestion(type)
+    
+    // Inherit styles from the currently selected question (or the last question)
+    const sourceQuestion = selectedQuestion || questions[questions.length - 1]
+    if (sourceQuestion?.style) {
+      newQuestion.style = { ...sourceQuestion.style }
+    }
+    
     setQuestions([...questions, newQuestion])
     setSelectedQuestionId(newQuestion.id)
     setShowAddQuestion(false)
@@ -139,13 +193,6 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
     setQuestions(newOrder)
     setHasUnsavedChanges(true)
   }
-
-  const copyFormLink = () => {
-    const link = `${window.location.origin}/f/${form.slug}`
-    navigator.clipboard.writeText(link)
-    toast.success('Link copied to clipboard')
-  }
-
 
   return (
     <div className="h-screen flex flex-col bg-white overflow-hidden">
@@ -186,18 +233,23 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Preview button - always available */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handlePreview}
+            disabled={questions.length === 0}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Preview
+          </Button>
+          
           {form.status === 'published' && (
             <>
-              <Button variant="outline" size="sm" onClick={copyFormLink}>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy link
+              <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
               </Button>
-              <Link href={`/f/${form.slug}`} target="_blank">
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View
-                </Button>
-              </Link>
             </>
           )}
           <Button 
@@ -661,15 +713,24 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
             <DialogDescription>
               {form.status === 'published' 
                 ? 'This will make your form inaccessible to respondents. Existing responses will be kept.'
-                : 'Your form will be accessible at:'
+                : 'Your form will be published and you will get a shareable link.'
               }
             </DialogDescription>
           </DialogHeader>
           {form.status !== 'published' && (
-            <div className="p-3 bg-slate-50 rounded-lg">
-              <code className="text-sm text-primary break-all">
-                {typeof window !== 'undefined' ? window.location.origin : ''}/f/{form.slug}
-              </code>
+            <div className="p-4 bg-slate-50 rounded-lg space-y-3">
+              <div className="flex items-center gap-2 text-slate-600">
+                <Link2 className="w-4 h-4" />
+                <span className="text-sm font-medium">A unique shareable link will be generated</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600">
+                <Check className="w-4 h-4 text-emerald-500" />
+                <span className="text-sm">All form data embedded in the URL</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600">
+                <Check className="w-4 h-4 text-emerald-500" />
+                <span className="text-sm">No backend required - works instantly</span>
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -678,15 +739,78 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
             </Button>
             <Button 
               onClick={handlePublish}
-              disabled={isSaving}
+              disabled={isSaving || questions.length === 0}
               className={form.status === 'published' 
                 ? 'bg-amber-500 hover:bg-amber-600' 
                 : 'bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20'
               }
             >
-              {isSaving ? 'Saving...' : form.status === 'published' ? 'Unpublish' : 'Publish'}
+              {isSaving ? 'Publishing...' : form.status === 'published' ? 'Unpublish' : 'Publish'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog - shown after publishing */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                <Check className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">Form Published!</DialogTitle>
+                <DialogDescription className="mt-1">
+                  Your form is ready to be shared
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-slate-700 mb-2 block">
+                Shareable Link
+              </Label>
+              <div className="flex gap-2">
+                <Input 
+                  value={generatedLink || generateShareLink()} 
+                  readOnly 
+                  className="flex-1 text-sm bg-slate-50 font-mono"
+                />
+                <Button onClick={copyShareLink} className="shrink-0">
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">
+                This link contains all form data and works without a database
+              </p>
+            </div>
+
+            <div className="border-t border-slate-200 pt-4">
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    const link = generatedLink || generateShareLink()
+                    window.open(link, '_blank')
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Open Form
+                </Button>
+                <Button 
+                  className="flex-1 bg-primary"
+                  onClick={() => setShowShareDialog(false)}
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

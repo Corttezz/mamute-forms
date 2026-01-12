@@ -93,11 +93,27 @@ export function FormPreview({
       >
         <div className="mb-8 w-full">
           {/* Progress bar */}
-          <div className="h-1 bg-white/20 rounded-full mb-12 overflow-hidden">
+          <div className="h-1 bg-white/20 rounded-full mb-12 overflow-hidden relative">
+            {/* Base progress - full segment (darker when auto-advance) */}
             <div 
-              className="h-full bg-white/60 rounded-full transition-all"
-              style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }}
+              className="h-full transition-all absolute left-0 top-0"
+              style={{ 
+                width: `${((questionIndex + 1) / questions.length) * 100}%`,
+                backgroundColor: selectedQuestion.logic?.autoAdvance?.enabled ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)'
+              }}
             />
+            {/* Auto-advance timer fill animation - starts from previous question */}
+            {selectedQuestion.logic?.autoAdvance?.enabled && (
+              <div 
+                className="h-full bg-white absolute top-0"
+                style={{ 
+                  left: `${(questionIndex / questions.length) * 100}%`,
+                  width: `${(1 / questions.length) * 100}%`,
+                  animation: `autoAdvanceSegment ${selectedQuestion.logic.autoAdvance.delaySeconds || 3}s linear infinite`,
+                  transformOrigin: 'left',
+                }}
+              />
+            )}
           </div>
         </div>
         

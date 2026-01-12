@@ -178,3 +178,13 @@
         max-width: 304px !important; /* 320px - 16px padding */
       }
     }
+
+/* Auto-advance progress animation - scales from left to right within the segment */
+@keyframes autoAdvanceSegment {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}

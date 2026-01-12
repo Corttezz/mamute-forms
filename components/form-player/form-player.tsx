@@ -40,9 +40,11 @@ export function FormPlayer({ form }: FormPlayerProps) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [direction, setDirection] = useState(0)
   const [timerSeconds, setTimerSeconds] = useState<number | null>(null)
+  const [autoAdvanceProgress, setAutoAdvanceProgress] = useState(0)
   
   const containerRef = useRef<HTMLDivElement>(null)
   const skipNextValidationRef = useRef(false)
+  const autoAdvanceStartRef = useRef<number | null>(null)
 
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
@@ -236,19 +238,45 @@ export function FormPlayer({ form }: FormPlayerProps) {
     }
   }, [currentQuestion, goToNext])
 
-  // Auto-advance logic
+  // Auto-advance logic with progress animation
   useEffect(() => {
     if (isSubmitted || isSubmitting) return
     
     const autoAdvance = currentQuestion?.logic?.autoAdvance
-    if (!autoAdvance?.enabled) return
+    if (!autoAdvance?.enabled) {
+      setAutoAdvanceProgress(0)
+      autoAdvanceStartRef.current = null
+      return
+    }
     
     const delay = (autoAdvance.delaySeconds || 3) * 1000
+    autoAdvanceStartRef.current = Date.now()
+    
+    // Animate progress bar
+    let animationId: number
+    const animateProgress = () => {
+      if (!autoAdvanceStartRef.current) return
+      
+      const elapsed = Date.now() - autoAdvanceStartRef.current
+      const progressPercent = Math.min((elapsed / delay) * 100, 100)
+      setAutoAdvanceProgress(progressPercent)
+      
+      if (progressPercent < 100) {
+        animationId = requestAnimationFrame(animateProgress)
+      }
+    }
+    animationId = requestAnimationFrame(animateProgress)
+    
     const timer = setTimeout(() => {
       goToNext(true) // Skip validation for auto-advance
     }, delay)
     
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      cancelAnimationFrame(animationId)
+      setAutoAdvanceProgress(0)
+      autoAdvanceStartRef.current = null
+    }
   }, [currentIndex, currentQuestion, isSubmitted, isSubmitting, goToNext])
 
   // Scroll/wheel navigation
@@ -390,11 +418,25 @@ export function FormPlayer({ form }: FormPlayerProps) {
     >
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <div className="h-1 bg-white/20">
+        <div className="h-1 bg-white/20 relative overflow-hidden">
+          {/* Base progress (darker when auto-advance is active) */}
           <div 
-            className="h-full bg-white/60 transition-all"
-            style={{ width: `${progress}%` }}
+            className="h-full absolute left-0 top-0 transition-all"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: currentQuestion?.logic?.autoAdvance?.enabled ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)'
+            }}
           />
+          {/* Auto-advance timer fill - starts from previous question's progress */}
+          {currentQuestion?.logic?.autoAdvance?.enabled && (
+            <div 
+              className="h-full bg-white absolute left-0 top-0 transition-none"
+              style={{ 
+                // previousProgress + (segmentWidth * autoAdvanceProgress%)
+                width: `${((currentIndex + (autoAdvanceProgress / 100)) / questions.length) * 100}%`,
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -444,17 +486,17 @@ export function FormPlayer({ form }: FormPlayerProps) {
                     transition={{ delay: 0.3 }}
                     className="mt-8"
                   >
-                    <Button
+                    <button
                       onClick={() => goToNext(true)}
                       disabled={isSubmitting}
-                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
+                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ 
-                        backgroundColor: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor,
-                        color: questionStyle?.buttonTextColor || displayTheme.backgroundColor,
+                        backgroundColor: questionStyle?.buttonBackgroundColor || 'white',
+                        color: questionStyle?.buttonTextColor || displayTheme.primaryColor,
                       }}
                     >
                       {currentQuestion.buttonText || (currentQuestion.type === 'welcome' ? 'Start' : 'Close')}
-                    </Button>
+                    </button>
                   </motion.div>
                 </>
               ) : (
@@ -534,22 +576,23 @@ export function FormPlayer({ form }: FormPlayerProps) {
                     )}
                   </AnimatePresence>
 
-                  {/* Action buttons - hide for content screens that don't need buttons */}
+                  {/* Action buttons - hide for content screens that auto-advance or don't need buttons */}
                   {(currentQuestion.type !== 'testimonials' && currentQuestion.type !== 'media' && 
-                    currentQuestion.type !== 'timer' && currentQuestion.type !== 'alert') && (
+                    currentQuestion.type !== 'timer' && currentQuestion.type !== 'alert' &&
+                    currentQuestion.type !== 'loading') && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
                     className="mt-8"
                   >
-                    <Button
+                    <button
                       onClick={() => goToNext()}
                       disabled={isSubmitting}
-                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg"
+                      className="w-full py-4 rounded-xl font-semibold text-base transition-all hover:opacity-90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ 
-                        backgroundColor: questionStyle?.buttonBackgroundColor || displayTheme.primaryColor,
-                        color: questionStyle?.buttonTextColor || displayTheme.backgroundColor,
+                        backgroundColor: questionStyle?.buttonBackgroundColor || 'white',
+                        color: questionStyle?.buttonTextColor || displayTheme.primaryColor,
                       }}
                     >
                       {isSubmitting ? (
@@ -561,7 +604,7 @@ export function FormPlayer({ form }: FormPlayerProps) {
                       ) : (
                         'Continue'
                       )}
-                    </Button>
+                    </button>
                     
                     <div className="mt-3 text-center">
                       <span 

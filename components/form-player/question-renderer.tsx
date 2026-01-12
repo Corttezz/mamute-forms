@@ -598,6 +598,47 @@ export function QuestionRenderer({
         </div>
       )
 
+    // Flow screens - these don't need input, just display content
+    case 'loading':
+      return (
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto" style={{ color: theme.textColor }} />
+        </div>
+      )
+
+    case 'result':
+      return (
+        <div className="text-center space-y-4">
+          {/* Result screen - displays personalized results */}
+          <div 
+            className="p-6 rounded-xl border-2 bg-white/5"
+            style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}
+          >
+            <p className="text-lg opacity-80" style={{ color: theme.textColor }}>
+              {question.description || 'Your personalized result will appear here'}
+            </p>
+          </div>
+        </div>
+      )
+
+    case 'alert':
+      return (
+        <div 
+          className="p-6 rounded-xl border-2 bg-white/10 backdrop-blur-sm"
+          style={{ 
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            color: theme.textColor 
+          }}
+        >
+          <div className="flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5" style={{ color: theme.primaryColor }} />
+            <p className="text-base leading-relaxed">
+              {question.description || 'Important information'}
+            </p>
+          </div>
+        </div>
+      )
+
     default:
       return (
         <p style={{ color: theme.textColor }} className="opacity-50">
