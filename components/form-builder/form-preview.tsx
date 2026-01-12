@@ -5,6 +5,7 @@ import { ThemeConfig } from '@/lib/database.types'
 import { themes, getTheme } from '@/lib/themes'
 import { motion } from 'framer-motion'
 import { Star, Check, Image } from 'lucide-react'
+import NextImage from 'next/image'
 
 interface FormPreviewProps {
   questions: QuestionConfig[]
@@ -84,11 +85,10 @@ export function FormPreview({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
         className={`
-          px-12 py-16 h-full transition-all flex flex-col ${alignmentClass} ${isCentered ? 'justify-center' : 'justify-start'}
+          px-12 py-8 flex-1 transition-all flex flex-col ${alignmentClass} ${isCentered ? 'justify-center' : 'justify-start'}
         `}
         style={{ 
           fontFamily: qStyle.fontFamily,
-          minHeight: 'calc(100vh - 200px)',
         } as React.CSSProperties}
       >
         <div className="mb-8 w-full">
@@ -432,6 +432,17 @@ export function FormPreview({
           )}
         </div>
       </motion.div>
+      
+      {/* Ad Banner - Footer inside preview */}
+      <div className="w-full shrink-0" style={{ paddingBottom: '65px' }}>
+        <NextImage 
+          src="/ad-banner.png" 
+          alt="Ad Banner" 
+          width={800}
+          height={200}
+          className="w-full h-auto"
+        />
+      </div>
     </div>
   )
 }
