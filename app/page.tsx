@@ -8,18 +8,15 @@ export default async function HomePage() {
   const user = null
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
+    <div className="min-h-screen w-full relative overflow-hidden bg-background">
       {/* Sophisticated Gradient Background */}
       <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(17, 24, 39, 0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 100% 50%, rgba(17, 24, 39, 0.05) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 0% 80%, rgba(17, 24, 39, 0.04) 0%, transparent 50%), linear-gradient(to bottom, #ffffff 0%, #fafafa 100%)",
-        }}
+        className="absolute inset-0 z-0 bg-gradient-to-b from-background to-muted/30 dark:from-background dark:to-muted/50"
       />
       
       {/* Subtle grid pattern */}
       <div 
-        className="absolute inset-0 z-0 opacity-[0.015]"
+        className="absolute inset-0 z-0 opacity-[0.015] dark:opacity-[0.03]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23111827' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
@@ -28,11 +25,10 @@ export default async function HomePage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50">
         <div 
-          className="absolute inset-0 h-28 backdrop-blur-md"
+          className="absolute inset-0 h-28 backdrop-blur-md bg-background/80 dark:bg-background/90"
           style={{
             maskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.92) 70%, rgba(255,255,255,0) 100%)',
           }}
         />
         <div className="relative max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -48,7 +44,7 @@ export default async function HomePage() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-slate-600 hover:text-slate-900">
+                  <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                     Sign in
                   </Button>
                 </Link>
@@ -72,14 +68,14 @@ export default async function HomePage() {
             Free & Open Source
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 leading-tight mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight mb-6 tracking-tight">
             Forms that feel{' '}
             <span className="text-primary">
               human
             </span>
           </h1>
           
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             Create beautiful, engaging forms that people actually want to fill out. 
             One question at a time, just like a conversation.
           </p>
@@ -92,7 +88,7 @@ export default async function HomePage() {
               </Button>
             </Link>
             <Link href="#features">
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-300 hover:border-slate-400 hover:bg-slate-50">
+              <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-border hover:bg-muted">
                 See how it works
               </Button>
             </Link>
@@ -103,16 +99,16 @@ export default async function HomePage() {
       {/* Demo Preview */}
       <section className="relative z-10 px-6 pb-20">
         <div className="max-w-5xl mx-auto">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-slate-200/80 bg-white">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-border bg-card">
             {/* Browser chrome */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 border-b border-slate-200">
+            <div className="flex items-center gap-2 px-4 py-3 bg-muted border-b border-border">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                <div className="w-3 h-3 rounded-full bg-slate-300"></div>
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/30"></div>
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/30"></div>
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/30"></div>
               </div>
               <div className="flex-1 flex justify-center">
-                <div className="px-4 py-1 bg-white rounded-md text-xs text-slate-500 font-medium">
+                <div className="px-4 py-1 bg-card rounded-md text-xs text-muted-foreground font-medium">
                   foxform.app/your-form
                 </div>
               </div>
@@ -138,29 +134,29 @@ export default async function HomePage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="relative z-10 py-20 px-6 bg-white">
+      <section id="features" className="relative z-10 py-20 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 tracking-tight">
               Everything you need to create amazing forms
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Powerful features that make form building a breeze
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-white border border-primary/20 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-card border border-primary/20 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">One at a Time</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-foreground mb-2">One at a Time</h3>
+              <p className="text-muted-foreground">
                 Questions appear one by one, creating a focused, distraction-free experience for respondents.
               </p>
             </div>
             
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-white border border-primary/20 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-card border border-primary/20 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                 <Palette className="w-6 h-6 text-primary" />
               </div>
@@ -170,12 +166,12 @@ export default async function HomePage() {
               </p>
             </div>
             
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-100/60 hover:shadow-lg hover:shadow-emerald-100/50 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-emerald-600" />
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-card border border-emerald-500/20 dark:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 dark:bg-emerald-500/30 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">Privacy First</h3>
-              <p className="text-slate-600">
+              <h3 className="text-xl font-semibold text-foreground mb-2">Privacy First</h3>
+              <p className="text-muted-foreground">
                 Your data stays yours. Export responses anytime, delete when you want.
               </p>
             </div>
@@ -184,13 +180,13 @@ export default async function HomePage() {
       </section>
 
       {/* Question Types */}
-      <section className="relative z-10 py-20 px-6 bg-slate-50/50">
+      <section className="relative z-10 py-20 px-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 tracking-tight">
               13 question types to choose from
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               From simple text to file uploads, we&apos;ve got you covered
             </p>
           </div>
@@ -203,7 +199,7 @@ export default async function HomePage() {
             ].map((type) => (
               <span
                 key={type}
-                className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-700 text-sm font-medium shadow-sm hover:border-primary/30 hover:bg-primary/10 transition-colors cursor-default"
+                className="px-4 py-2 bg-card rounded-full border border-border text-foreground text-sm font-medium shadow-sm hover:border-primary/30 hover:bg-primary/10 transition-colors cursor-default"
               >
                 {type}
               </span>
@@ -213,7 +209,7 @@ export default async function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="relative z-10 py-20 px-6 bg-white">
+      <section className="relative z-10 py-20 px-6 bg-background">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 rounded-3xl p-12 md:p-16 text-white relative overflow-hidden">
             {/* Decorative elements */}
@@ -237,19 +233,19 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-slate-100 bg-white">
+      <footer className="relative z-10 py-8 px-6 border-t border-border bg-background">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-600 text-sm">
+          <p className="text-muted-foreground text-sm">
             © 2026 FoxForm. Open source and free forever.
           </p>
           <div className="flex items-center gap-6">
-            <a href="https://github.com" className="text-slate-500 hover:text-slate-700 text-sm transition-colors">
+            <a href="https://github.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
               GitHub
             </a>
-            <a href="#" className="text-slate-500 hover:text-slate-700 text-sm transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
               Privacy
             </a>
-            <a href="#" className="text-slate-500 hover:text-slate-700 text-sm transition-colors">
+            <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
               Terms
             </a>
           </div>
