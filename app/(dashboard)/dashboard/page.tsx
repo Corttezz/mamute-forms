@@ -216,7 +216,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-card border-t border-b border-border px-8 mb-6">
+        <div className="bg-card border-t border-b border-border px-8 mb-6"> 
           <div className="w-full py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="w-[300px] relative">
