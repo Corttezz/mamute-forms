@@ -39,9 +39,9 @@ export function FormPreview({
   }
   if (questions.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-muted/30" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
-          <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+          <p className="text-muted-foreground text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Add questions to see a preview
           </p>
         </div>
@@ -56,9 +56,9 @@ export function FormPreview({
 
   if (!selectedQuestion) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-white" style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)] p-8 bg-muted/30" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
-          <p className="text-slate-600 text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+          <p className="text-muted-foreground text-[14px]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
             Select a question to preview
           </p>
         </div>

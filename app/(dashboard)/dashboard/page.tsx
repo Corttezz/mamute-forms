@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -165,11 +166,11 @@ function getTimeAgo(date: string) {
 function getStatusBadge(status: FormStatus) {
   switch (status) {
     case 'published':
-      return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">Published</Badge>
+      return <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 border-0">Published</Badge>
     case 'draft':
-      return <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-0">Draft</Badge>
+      return <Badge variant="secondary" className="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border-0">Draft</Badge>
     case 'closed':
-      return <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-0">Closed</Badge>
+      return <Badge variant="secondary" className="bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 border-0">Closed</Badge>
   }
 }
 
@@ -177,6 +178,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const router = useRouter()
+  const { theme } = useTheme()
 
   const filteredForms = useMemo(() => {
     if (!searchQuery) return mockForms
@@ -192,15 +194,15 @@ export default function DashboardPage() {
         <div className="mb-6">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h1 className="text-[24px] font-semibold text-slate-900 mb-1" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+              <h1 className="text-[24px] font-semibold text-foreground mb-1" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
                 Forms
               </h1>
-              <p className="text-[14px] text-slate-600" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+              <p className="text-[14px] text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                 Create and manage your your forms
               </p>
             </div>
             <Link href="/forms/new">
-              <Button className="bg-[#111827] hover:bg-[#111827]/90 text-white h-10 text-[14px] font-medium" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 text-[14px] font-medium" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Create form
               </Button>
@@ -209,27 +211,27 @@ export default function DashboardPage() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-white border-t border-b border-slate-200 -mx-8 px-8 mb-6">
+        <div className="bg-card border-t border-b border-border -mx-8 px-8 mb-6">
           <div className="w-full py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="w-[300px] relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search forms..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10 text-[14px] border-slate-200 shadow-none"
+                  className="pl-10 h-10 text-[14px] border-border shadow-none"
                   style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
                 />
               </div>
               
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" className="h-10 text-[14px] border-slate-200 bg-white" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                <Button variant="outline" size="sm" className="h-10 text-[14px] border-border bg-card" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                   <Filter className="w-4 h-4 mr-2" />
                   Filter
                 </Button>
                 
-                <Button variant="outline" size="sm" className="h-10 text-[14px] border-slate-200 bg-white" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                <Button variant="outline" size="sm" className="h-10 text-[14px] border-border bg-card" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                   <ArrowUpDown className="w-4 h-4 mr-2" />
                   Sort
                 </Button>
@@ -238,7 +240,7 @@ export default function DashboardPage() {
                   <Button
                     variant={viewMode === 'list' ? 'default' : 'outline'}
                     size="sm"
-                    className={`h-10 w-10 p-0 ${viewMode === 'list' ? 'bg-[#111827] text-white' : 'bg-white border-slate-200'}`}
+                    className={`h-10 w-10 p-0 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-card border-border'}`}
                     onClick={() => setViewMode('list')}
                   >
                     <List className="w-4 h-4" />
@@ -246,7 +248,7 @@ export default function DashboardPage() {
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
                     size="sm"
-                    className={`h-10 w-10 p-0 ${viewMode === 'grid' ? 'bg-[#111827] text-white' : 'bg-white border-slate-200'}`}
+                    className={`h-10 w-10 p-0 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-card border-border'}`}
                     onClick={() => setViewMode('grid')}
                   >
                     <Grid className="w-4 h-4" />
@@ -258,25 +260,25 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
           {/* Forms Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                <tr className="border-b border-border bg-muted">
+                  <th className="text-[14px] text-muted-foreground font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                     Form name
                   </th>
-                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                  <th className="text-[14px] text-muted-foreground font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                     Status
                   </th>
-                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                  <th className="text-[14px] text-muted-foreground font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                     Responses
                   </th>
-                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                  <th className="text-[14px] text-muted-foreground font-medium px-6 py-4 text-left" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                     Last updated
                   </th>
-                  <th className="text-[14px] text-slate-600 font-medium px-6 py-4 text-right" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
+                  <th className="text-[14px] text-muted-foreground font-medium px-6 py-4 text-right" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>
                     Actions
                   </th>
                 </tr>
@@ -287,22 +289,22 @@ export default function DashboardPage() {
                   return (
                     <tr 
                       key={form.id} 
-                      className={`border-b border-slate-200 hover:bg-slate-50 transition-colors ${index === filteredForms.length - 1 ? 'border-b-0' : ''}`}
+                      className={`border-b border-border hover:bg-muted transition-colors ${index === filteredForms.length - 1 ? 'border-b-0' : ''}`}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${form.status === 'published' ? 'bg-[#111827]' : 'bg-slate-500'}`}>
-                            <FileText className="w-5 h-5 text-white" />
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${form.status === 'published' ? 'bg-primary' : 'bg-muted-foreground'}`}>
+                            <FileText className="w-5 h-5 text-primary-foreground" />
                           </div>
                           <div>
                             <Link
                               href={`/forms/${form.id}/edit`}
-                              className="text-[14px] font-medium text-slate-900 hover:text-[#111827] transition-colors block"
+                              className="text-[14px] font-medium text-foreground hover:text-primary transition-colors block"
                               style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
                             >
                               {form.title}
                             </Link>
-                            <p className="text-[12px] text-slate-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                            <p className="text-[12px] text-muted-foreground mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                               {getTimeAgo(form.created_at)}
                             </p>
                           </div>
@@ -314,23 +316,23 @@ export default function DashboardPage() {
                       <td className="px-6 py-4">
                         {form.status === 'published' ? (
                           <div className="flex flex-col">
-                            <span className="text-[14px] text-slate-900" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                            <span className="text-[14px] text-foreground" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                               {responseData.total.toLocaleString('en-US').replace(/,/g, '.')}
                             </span>
                             {responseData.today > 0 && (
-                              <span className="text-[12px] text-emerald-600 mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                              <span className="text-[12px] text-emerald-500 mt-0.5" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                                 (+{responseData.today} today)
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[14px] text-slate-400" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                          <span className="text-[14px] text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                             Not published
                           </span>
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[14px] text-slate-600" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                        <span className="text-[14px] text-muted-foreground" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                           {formatDate(form.updated_at)}
                         </span>
                       </td>
@@ -365,27 +367,31 @@ export default function DashboardPage() {
           </div>
 
           {/* Help Section */}
-          <div className="px-6 py-6 bg-[#000000]">
+          <div 
+            className="px-6 py-6 border-t border-border"
+            style={theme === 'dark' ? { background: 'linear-gradient(90deg, #1F255C 0%, #40499A 100%)' } : { backgroundColor: 'var(--card)' }}
+          >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="text-[18px] font-semibold text-white mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                <h3 className="text-[18px] font-semibold text-foreground mb-2" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
                   Need help getting started?
                 </h3>
-                <p className="text-[14px] text-white/80 mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
+                <p className="text-[14px] text-muted-foreground mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}>
                   Check out our comprehensive guides and tutorials to make the most of FoxForm.
                 </p>
                 <div className="flex items-center gap-3">
                   <Button
                     size="sm"
-                    className="h-9 bg-white text-[#000000] hover:bg-white/90 text-[14px] border-0"
+                    className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 text-[14px] border-0"
                     style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
                   >
                     <BookOpen className="w-4 h-4 mr-2" />
                     View Documentation
                   </Button>
                   <Button
+                    variant="outline"
                     size="sm"
-                    className="h-9 bg-[#000000] text-white hover:bg-[#000000]/90 text-[14px] border border-white/20"
+                    className="h-9 bg-transparent text-foreground hover:bg-muted text-[14px] border-border"
                     style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
                   >
                     <Play className="w-4 h-4 mr-2" />

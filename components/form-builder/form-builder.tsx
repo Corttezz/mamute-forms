@@ -195,9 +195,9 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0">
+      <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-4">
           <Link href="/dashboard">
             <Button variant="ghost" size="sm">
@@ -213,22 +213,22 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                 setForm({ ...form, title: e.target.value })
                 setHasUnsavedChanges(true)
               }}
-              className="text-lg font-semibold border-0 border-b-2 border-transparent bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-primary hover:border-slate-300 px-1 pr-7 max-w-xs transition-colors"
+              className="text-lg font-semibold border-0 border-b-2 border-transparent bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-primary hover:border-border px-1 pr-7 max-w-xs transition-colors"
               placeholder="Untitled Form"
             />
-            <Pencil className="w-3.5 h-3.5 text-slate-400 absolute right-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-0 transition-opacity pointer-events-none" />
+            <Pencil className="w-3.5 h-3.5 text-muted-foreground absolute right-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-0 transition-opacity pointer-events-none" />
           </div>
           {form.status === 'published' && (
-            <Badge className="bg-emerald-100 text-emerald-700">Published</Badge>
+            <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Published</Badge>
           )}
           {form.status === 'draft' && (
             <Badge variant="secondary">Draft</Badge>
           )}
           {form.status === 'closed' && (
-            <Badge variant="secondary" className="bg-amber-100 text-amber-700">Closed</Badge>
+            <Badge variant="secondary" className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Closed</Badge>
           )}
           {hasUnsavedChanges && (
-            <span className="text-sm text-slate-500">Unsaved changes</span>
+            <span className="text-sm text-muted-foreground">Unsaved changes</span>
           )}
         </div>
 
@@ -276,7 +276,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-slate-200 bg-white">
+      <div className="border-b border-border bg-card">
         <div className="px-4">
           <div className="flex items-center gap-8">
             <button
@@ -284,8 +284,8 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               className={`
                 py-3 px-1 border-b-2 font-medium text-sm transition-colors
                 ${activeMainTab === 'content'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
                 }
               `}
             >
@@ -296,8 +296,8 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               className={`
                 py-3 px-1 border-b-2 font-medium text-sm transition-colors
                 ${activeMainTab === 'results'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
                 }
               `}
             >
@@ -308,8 +308,8 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               className={`
                 py-3 px-1 border-b-2 font-medium text-sm transition-colors
                 ${activeMainTab === 'settings'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
                 }
               `}
             >
@@ -320,8 +320,8 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               className={`
                 py-3 px-1 border-b-2 font-medium text-sm transition-colors
                 ${activeMainTab === 'connect'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
                 }
               `}
             >
@@ -335,10 +335,10 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       {activeMainTab === 'content' && (
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden" style={{ width: '320px', maxWidth: '320px' }}>
-          <div className="shrink-0 px-6 pt-6 pb-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900 ">Screens</h2>
-            <p className="text-sm text-slate-600">Manage your form flow</p>
+        <aside className="w-80 bg-card border-r border-border flex flex-col shrink-0 overflow-hidden" style={{ width: '320px', maxWidth: '320px' }}>
+          <div className="shrink-0 px-6 pt-6 pb-4 border-b border-border">
+            <h2 className="text-lg font-semibold text-foreground">Screens</h2>
+            <p className="text-sm text-muted-foreground">Manage your form flow</p>
           </div>
 
           <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full" style={{ width: '100%', maxWidth: '100%' }}>
@@ -347,9 +347,9 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                 <div className="p-2 w-full max-w-full overflow-hidden box-border" style={{ width: '100%', maxWidth: '100%', padding: '8px' }}>
                 {questions.length === 0 ? (
                   <div className="text-center py-8 px-4">
-                    <FileText className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-                    <p className="text-sm text-slate-500">No screens yet</p>
-                    <p className="text-xs text-slate-400 mt-1">Add your first screen to get started</p>
+                    <FileText className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                    <p className="text-sm text-muted-foreground">No screens yet</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">Add your first screen to get started</p>
                   </div>
                 ) : (
                   <div className="w-full max-w-full overflow-hidden" style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
@@ -378,7 +378,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                                 group p-3 rounded-lg cursor-pointer mb-2 border transition-all w-full overflow-hidden
                                 ${selectedQuestionId === question.id 
                                   ? 'bg-primary/10 border-primary/20' 
-                                  : 'bg-white border-slate-100 hover:border-slate-200'
+                                  : 'bg-background border-border hover:border-border/80'
                                 }
                               `}
                               style={{ 
@@ -392,14 +392,14 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                             >
                                 <div className="flex items-start gap-2 w-full min-w-0" style={{ width: '100%', maxWidth: '100%' }}>
                                   <div className="mt-1 cursor-grab active:cursor-grabbing flex-shrink-0">
-                                    <GripVertical className="w-4 h-4 text-slate-300" />
+                                    <GripVertical className="w-4 h-4 text-muted-foreground/50" />
                                   </div>
                                   <div className="flex-1 min-w-0 overflow-hidden" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
                                     <div className="flex items-center gap-2 mb-1">
-                                      <span className="text-xs font-medium text-slate-400 flex-shrink-0">
+                                      <span className="text-xs font-medium text-muted-foreground flex-shrink-0">
                                         {index + 1}
                                       </span>
-                                      <span className="text-xs text-slate-400 capitalize flex-shrink-0">
+                                      <span className="text-xs text-muted-foreground capitalize flex-shrink-0">
                                         {question.type.replace('_', ' ')}
                                       </span>
                                       {question.required && (
@@ -411,16 +411,16 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                                         const typeInfo = getQuestionTypeInfo(question.type)
                                         const Icon = typeInfo?.icon
                                         if (Icon) {
-                                          return <Icon className="w-4 h-4 text-slate-900 flex-shrink-0" />
+                                          return <Icon className="w-4 h-4 text-foreground flex-shrink-0" />
                                         }
                                         return null
                                       })()}
-                                      <p className="text-sm font-medium text-slate-900 truncate min-w-0 flex-1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
+                                      <p className="text-sm font-medium text-foreground truncate min-w-0 flex-1" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
                                         {question.title || 'Untitled question'}
                                       </p>
                                     </div>
                                     {question.description && (
-                                      <p className="text-xs text-slate-500 truncate mt-0.5 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
+                                      <p className="text-xs text-muted-foreground truncate mt-0.5 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, maxWidth: '100%' }}>
                                         {question.description}
                                       </p>
                                     )}
@@ -434,7 +434,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                                       deleteQuestion(question.id)
                                     }}
                                   >
-                                    <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-500" />
+                                    <Trash2 className="w-4 h-4 text-muted-foreground hover:text-red-500" />
                                   </Button>
                                 </div>
                               </motion.div>
@@ -448,10 +448,10 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
               </ScrollArea>
             </div>
             
-            <div className="shrink-0 px-4 py-4 border-t border-slate-200">
+            <div className="shrink-0 px-4 py-4 border-t border-border">
               <Button 
                 onClick={() => setShowAddQuestion(true)}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add screen
@@ -465,12 +465,12 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
         {/* Preview / Editor area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Preview */}
-          <div className="flex-1 overflow-auto bg-slate-100 p-8 flex flex-col">
+          <div className="flex-1 overflow-auto bg-muted/30 p-8 flex flex-col">
             <div className="max-w-2xl mx-auto flex-1 flex flex-col min-h-0 w-full">
-              <div className="rounded-lg shadow-sm border border-slate-200 overflow-hidden mb-4 flex-1 flex flex-col min-h-0">
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-200 flex-shrink-0">
-                  <Eye className="w-4 h-4 text-slate-500" />
-                  <span className="text-sm font-medium text-slate-600">Preview</span>
+              <div className="rounded-lg shadow-sm border border-border overflow-hidden mb-4 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center gap-2 px-4 py-2 bg-muted border-b border-border flex-shrink-0">
+                  <Eye className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Preview</span>
                 </div>
                 <div className="flex-1 min-h-0 overflow-hidden">
                   <FormPreview 
@@ -490,7 +490,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
           {/* Question Editor - Right side */}
           {selectedQuestion && (
-            <div className="w-96 bg-white border-l border-slate-200 overflow-hidden shrink-0 flex flex-col h-full">
+            <div className="w-96 bg-card border-l border-border overflow-hidden shrink-0 flex flex-col h-full">
               <QuestionEditor
                 question={selectedQuestion}
                 questions={questions}
@@ -504,11 +504,11 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       )}
 
       {activeMainTab === 'results' && (
-        <div className="flex-1 flex items-center justify-center bg-slate-50">
+        <div className="flex-1 flex items-center justify-center bg-muted/30">
           <div className="text-center">
-            <BarChart3 className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Results</h3>
-            <p className="text-slate-600">View and analyze form responses here</p>
+            <BarChart3 className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Results</h3>
+            <p className="text-muted-foreground">View and analyze form responses here</p>
             <Link href={`/forms/${form.id}/responses`}>
               <Button className="mt-4">
                 View Responses
@@ -519,17 +519,17 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       )}
 
       {activeMainTab === 'settings' && (
-        <div className="flex-1 overflow-auto bg-slate-50 p-8">
+        <div className="flex-1 overflow-auto bg-muted/30 p-8">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 space-y-6">
+            <div className="bg-card rounded-lg shadow-sm border border-border p-6 space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Form Settings</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Form Settings</h3>
                 
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="form-slug" className="text-sm font-medium">Form URL</Label>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-sm text-slate-500">/f/</span>
+                      <span className="text-sm text-muted-foreground">/f/</span>
                       <Input
                         id="form-slug"
                         value={form.slug}
@@ -581,12 +581,12 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       )}
 
       {activeMainTab === 'connect' && (
-        <div className="flex-1 flex items-center justify-center bg-slate-50">
+        <div className="flex-1 flex items-center justify-center bg-muted/30">
           <div className="text-center">
-            <Plug className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Connect</h3>
-            <p className="text-slate-600">Integrate your form with external services</p>
-            <p className="text-sm text-slate-500 mt-2">Coming soon</p>
+            <Plug className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Connect</h3>
+            <p className="text-muted-foreground">Integrate your form with external services</p>
+            <p className="text-sm text-muted-foreground/70 mt-2">Coming soon</p>
           </div>
         </div>
       )}
@@ -595,11 +595,11 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
       <Dialog open={showAddQuestion} onOpenChange={setShowAddQuestion}>
         <DialogContent className="max-w-[70vw] w-[70vw] max-h-[85vh] overflow-hidden flex flex-col p-0" showCloseButton={false}>
           {/* Header with white background */}
-          <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-            <DialogTitle className="text-slate-900 text-xl font-semibold">Add Screen</DialogTitle>
+          <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+            <DialogTitle className="text-foreground text-xl font-semibold">Add Screen</DialogTitle>
             <button
               onClick={() => setShowAddQuestion(false)}
-              className="text-slate-500 hover:text-slate-700 transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -607,7 +607,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
           
           {/* Subtitle */}
           <div className="px-6 pt-4 pb-2">
-            <DialogDescription className="text-slate-600">
+            <DialogDescription className="text-muted-foreground">
               Choose a screen type to add to your form flow
             </DialogDescription>
           </div>
@@ -616,7 +616,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
           <div className="flex-1 overflow-y-auto px-6 pb-4">
             {/* Flow Screens */}
             <div className="mb-8">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Flow Screens</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">Flow Screens</h3>
               <div className="grid grid-cols-4 gap-3">
                 {flowScreens.map((screen) => (
                   <button
@@ -625,7 +625,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                       addQuestion(screen.type)
                       setShowAddQuestion(false)
                     }}
-                    className="p-4 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                    className="p-4 rounded-lg border border-border hover:border-blue-500 hover:bg-blue-500/10 transition-all text-left group"
                   >
                     {screen.type === 'welcome' ? (
                       <div className="relative w-6 h-6 mb-2">
@@ -635,11 +635,11 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                     ) : (
                       <screen.icon className={`w-6 h-6 mb-2 ${
                         screen.type === 'loading' || screen.type === 'result' ? 'text-purple-500' :
-                        'text-slate-400'
+                        'text-muted-foreground'
                       } group-hover:scale-110 transition-transform`} />
                     )}
-                    <p className="font-medium text-sm text-slate-900">{screen.label}</p>
-                    <p className="text-xs text-slate-500 mt-1">{screen.description}</p>
+                    <p className="font-medium text-sm text-foreground">{screen.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{screen.description}</p>
                   </button>
                 ))}
               </div>
@@ -647,7 +647,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
             {/* Question Screens */}
             <div className="mb-8">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Question Screens</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">Question Screens</h3>
               <div className="grid grid-cols-4 gap-3">
                 {questionTypes.map((qt) => (
                   <button
@@ -656,11 +656,11 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                       addQuestion(qt.type)
                       setShowAddQuestion(false)
                     }}
-                    className="p-4 rounded-lg border border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all text-left group"
+                    className="p-4 rounded-lg border border-border hover:border-border/80 hover:bg-muted transition-all text-left group"
                   >
-                    <qt.icon className="w-6 h-6 text-slate-400 group-hover:text-slate-600 mb-2" />
-                    <p className="font-medium text-sm text-slate-900">{qt.label}</p>
-                    <p className="text-xs text-slate-500 mt-1">{qt.description}</p>
+                    <qt.icon className="w-6 h-6 text-muted-foreground group-hover:text-foreground mb-2" />
+                    <p className="font-medium text-sm text-foreground">{qt.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{qt.description}</p>
                   </button>
                 ))}
               </div>
@@ -668,7 +668,7 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
 
             {/* Content Screens */}
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Content Screens</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">Content Screens</h3>
               <div className="grid grid-cols-4 gap-3">
                 {contentScreens.map((screen) => (
                   <button
@@ -677,13 +677,13 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
                       addQuestion(screen.type)
                       setShowAddQuestion(false)
                     }}
-                    className="p-4 rounded-lg border border-slate-200 hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+                    className="p-4 rounded-lg border border-border hover:border-orange-500 hover:bg-orange-500/10 transition-all text-left group"
                   >
                     <screen.icon className={`w-6 h-6 mb-2 ${
                       screen.type === 'media' ? 'text-pink-500' : 'text-orange-500'
                     } group-hover:scale-110 transition-transform`} />
-                    <p className="font-medium text-sm text-slate-900">{screen.label}</p>
-                    <p className="text-xs text-slate-500 mt-1">{screen.description}</p>
+                    <p className="font-medium text-sm text-foreground">{screen.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{screen.description}</p>
                   </button>
                 ))}
               </div>
@@ -691,12 +691,12 @@ export function FormBuilder({ form: initialForm }: FormBuilderProps) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-slate-200 px-6 py-3 flex items-center justify-between bg-slate-50">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="border-t border-border px-6 py-3 flex items-center justify-between bg-muted/30">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Info className="w-4 h-4" />
               <span>Selection adds screen immediately</span>
             </div>
-            <div className="text-xs text-slate-400 font-medium">
+            <div className="text-xs text-muted-foreground/70 font-medium">
               FoxForm Builder
             </div>
           </div>

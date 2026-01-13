@@ -26,9 +26,9 @@ export function DashboardWrapper({ children, user }: DashboardWrapperProps) {
   }
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-background">
       <Sidebar user={user} />
-      <main className="flex-1 ml-64 overflow-auto bg-white">
+      <main className="flex-1 ml-64 overflow-auto bg-background">
         {children}
       </main>
     </div>

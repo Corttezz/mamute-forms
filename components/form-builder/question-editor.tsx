@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -67,31 +66,52 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
 
   return (
     <div className="h-full flex flex-col">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-        <div className="shrink-0 px-6 pt-4 pb-0 border-b border-slate-200">
-          <TabsList className="grid w-full grid-cols-3 bg-transparent p-0 gap-0 h-auto border-0 shadow-none">
-            <TabsTrigger 
-              value="component" 
-              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 mr-6 focus-visible:ring-0 focus-visible:outline-none"
+      <div className="border-b border-border bg-card">
+        <div className="px-4">
+          <div className="flex items-center gap-8">
+            <button
+              onClick={() => setActiveTab('component')}
+              className={`
+                py-3 px-1 border-b-2 font-medium text-sm transition-colors
+                ${activeTab === 'component'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                }
+              `}
             >
               Component
-            </TabsTrigger>
-            <TabsTrigger 
-              value="style" 
-              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 mr-6 focus-visible:ring-0 focus-visible:outline-none"
+            </button>
+            <button
+              onClick={() => setActiveTab('style')}
+              className={`
+                py-3 px-1 border-b-2 font-medium text-sm transition-colors
+                ${activeTab === 'style'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                }
+              `}
             >
               Style
-            </TabsTrigger>
-            <TabsTrigger 
-              value="logic" 
-              className="text-sm font-medium data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-slate-900 data-[state=active]:font-semibold text-slate-600 hover:text-slate-900 rounded-none border-0 border-b-2 border-transparent data-[state=active]:border-slate-900 pb-3 px-0 focus-visible:ring-0 focus-visible:outline-none"
+            </button>
+            <button
+              onClick={() => setActiveTab('logic')}
+              className={`
+                py-3 px-1 border-b-2 font-medium text-sm transition-colors
+                ${activeTab === 'logic'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                }
+              `}
             >
               Logic
-            </TabsTrigger>
-          </TabsList>
+            </button>
+          </div>
         </div>
+      </div>
 
-        <TabsContent value="component" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
+      {/* Main content */}
+      {activeTab === 'component' && (
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           <div className="p-6 space-y-6">
       {/* Screen Type (for flow screens) */}
       {isFlowScreen && (
@@ -118,7 +138,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
       {!isFlowScreen && (
         <div className="flex items-center gap-2">
           {typeInfo && <typeInfo.icon className="w-4 h-4 text-primary" />}
-          <span className="text-sm font-medium text-slate-600">{typeInfo?.label}</span>
+          <span className="text-sm font-medium text-muted-foreground">{typeInfo?.label}</span>
         </div>
       )}
 
@@ -140,7 +160,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
       {/* Description */}
       <div>
         <Label htmlFor="description" className="text-sm font-medium">
-          Description <span className="text-slate-400 font-normal">(optional)</span>
+          Description <span className="text-muted-foreground font-normal">(optional)</span>
         </Label>
         <Textarea
           id="description"
@@ -166,7 +186,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
           }
           className="mt-2"
         />
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           {question.type === 'welcome' || question.type === 'end' 
             ? 'Text displayed on the action button'
             : 'Leave empty to use default (Continue/Submit)'}
@@ -189,7 +209,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
                 className="flex items-center gap-2"
               >
                 <div className="cursor-grab active:cursor-grabbing">
-                  <GripVertical className="w-4 h-4 text-slate-300" />
+                  <GripVertical className="w-4 h-4 text-muted-foreground/50" />
                 </div>
                 <Input
                   value={option}
@@ -204,7 +224,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
                   className="h-8 w-8 p-0"
                   disabled={(question.options?.length || 0) <= 1}
                 >
-                  <X className="w-4 h-4 text-slate-400" />
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </Button>
               </div>
             ))}
@@ -241,7 +261,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
           <Label className="text-sm font-medium mb-3 block">Rating Scale</Label>
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <Label htmlFor="minValue" className="text-xs text-slate-500">Min</Label>
+              <Label htmlFor="minValue" className="text-xs text-muted-foreground">Min</Label>
               <Input
                 id="minValue"
                 type="number"
@@ -253,7 +273,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               />
             </div>
             <div className="flex-1">
-              <Label htmlFor="maxValue" className="text-xs text-slate-500">Max</Label>
+              <Label htmlFor="maxValue" className="text-xs text-muted-foreground">Max</Label>
               <Input
                 id="maxValue"
                 type="number"
@@ -273,7 +293,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
           <Label className="text-sm font-medium mb-3 block">Scale Range</Label>
           <div className="flex items-center gap-4">
             <div className="flex-1">
-              <Label htmlFor="minValue" className="text-xs text-slate-500">Min</Label>
+              <Label htmlFor="minValue" className="text-xs text-muted-foreground">Min</Label>
               <Input
                 id="minValue"
                 type="number"
@@ -285,7 +305,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               />
             </div>
             <div className="flex-1">
-              <Label htmlFor="maxValue" className="text-xs text-slate-500">Max</Label>
+              <Label htmlFor="maxValue" className="text-xs text-muted-foreground">Max</Label>
               <Input
                 id="maxValue"
                 type="number"
@@ -304,7 +324,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
         <div className="space-y-4">
           <div>
             <Label className="text-sm font-medium mb-2 block">Allowed file types</Label>
-            <p className="text-sm text-slate-500">Images and PDFs are allowed</p>
+            <p className="text-sm text-muted-foreground">Images and PDFs are allowed</p>
           </div>
           <div>
             <Label htmlFor="maxFileSize" className="text-sm font-medium">Max file size (MB)</Label>
@@ -397,12 +417,12 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
       {question.type === 'testimonials' && (
         <div className="space-y-4">
           <Label className="text-sm font-medium">Testimonials</Label>
-          <p className="text-xs text-slate-500 mb-3">Format: Name|Rating(1-5)|Comment|Initials</p>
+          <p className="text-xs text-muted-foreground mb-3">Format: Name|Rating(1-5)|Comment|Initials</p>
           <div className="space-y-3">
             {(question.options || []).map((testimonial, index) => {
               const parts = testimonial.split('|')
               return (
-                <div key={index} className="p-3 border border-slate-200 rounded-lg space-y-2">
+                <div key={index} className="p-3 border border-border rounded-lg space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Testimonial {index + 1}</span>
                     <Button
@@ -414,7 +434,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
                       }}
                       className="h-6 w-6 p-0"
                     >
-                      <X className="w-3 h-3 text-slate-400" />
+                      <X className="w-3 h-3 text-muted-foreground" />
                     </Button>
                   </div>
                   <Input
@@ -519,7 +539,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               placeholder="https://example.com/image.jpg"
               className="mt-2"
             />
-            <p className="text-xs text-slate-500 mt-1">Enter the URL of the image or video</p>
+            <p className="text-xs text-muted-foreground mt-1">Enter the URL of the image or video</p>
           </div>
         </div>
       )}
@@ -537,7 +557,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               max={3600}
               className="mt-2"
             />
-            <p className="text-xs text-slate-500 mt-1">Timer will countdown from this value</p>
+            <p className="text-xs text-muted-foreground mt-1">Timer will countdown from this value</p>
           </div>
           <div>
             <Label htmlFor="timer-message" className="text-sm font-medium">End message</Label>
@@ -549,7 +569,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               placeholder="Time is up!"
               className="mt-2"
             />
-            <p className="text-xs text-slate-500 mt-1">Message shown when timer reaches zero</p>
+            <p className="text-xs text-muted-foreground mt-1">Message shown when timer reaches zero</p>
           </div>
           <div>
             <Label htmlFor="timer-action" className="text-sm font-medium mb-2 block">Action when timer ends</Label>
@@ -579,7 +599,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
           <div className="flex items-center justify-between">
             <div>
               <Label className="text-sm font-medium">Required</Label>
-              <p className="text-xs text-slate-500">Respondents must answer this question</p>
+              <p className="text-xs text-muted-foreground">Respondents must answer this question</p>
             </div>
             <Switch
               checked={question.required}
@@ -600,24 +620,28 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
         <Trash2 className="w-4 h-4 mr-2" />
         Delete question
       </Button>
-          </div>
-        </TabsContent>
+        </div>
+        </div>
+      )}
 
-        <TabsContent value="style" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
+      {activeTab === 'style' && (
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           <QuestionStyleEditor
             style={questionStyle}
             onUpdate={handleStyleUpdate}
           />
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="logic" className="flex-1 mt-0 overflow-y-auto overflow-x-hidden data-[state=inactive]:hidden">
+      {activeTab === 'logic' && (
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           <div className="p-6 space-y-6">
             {/* Auto-advance */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <Label className="text-sm font-medium">Enable auto-advance</Label>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Automatically advance to the next screen
                   </p>
                 </div>
@@ -657,7 +681,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
                     max={60}
                     className="mt-2"
                   />
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     How long to wait before advancing to the next screen
                   </p>
                 </div>
@@ -695,7 +719,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
                     <SelectItem value="end_form">End form</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Define what happens when user clicks the button
                 </p>
               </div>
@@ -733,8 +757,8 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
               )}
             </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   )
 }

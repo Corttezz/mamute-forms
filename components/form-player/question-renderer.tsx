@@ -285,8 +285,8 @@ export function QuestionRenderer({
                     <Check className="w-4 h-4" style={{ color: theme.backgroundColor }} />
                   ) : (
                     <span className="text-sm font-medium" style={{ color: theme.textColor }}>
-                      {String.fromCharCode(65 + index)}
-                    </span>
+                    {String.fromCharCode(65 + index)}
+                  </span>
                   )}
                 </div>
                 <span className="text-lg">{option}</span>
@@ -331,8 +331,8 @@ export function QuestionRenderer({
                     <Check className="w-4 h-4" style={{ color: theme.backgroundColor }} />
                   ) : (
                     <span className="text-sm font-medium" style={{ color: theme.textColor }}>
-                      {String.fromCharCode(65 + index)}
-                    </span>
+                    {String.fromCharCode(65 + index)}
+                  </span>
                   )}
                 </div>
                 <span className="text-lg">{option}</span>

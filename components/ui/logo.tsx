@@ -3,18 +3,34 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 interface LogoProps {
   href?: string
   size?: 'sm' | 'md' | 'lg'
   className?: string
-  variant?: 'black' | 'white'
+  variant?: 'black' | 'white' | 'auto'
 }
 
-export function Logo({ href = '/', size = 'md', className, variant = 'black' }: LogoProps) {
-  const logoSrc = variant === 'white' 
-    ? '/logo-fox-form-text-white.png'
-    : '/fox-form-logo-text-black.png'
+export function Logo({ href = '/', size = 'md', className, variant = 'auto' }: LogoProps) {
+  const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Determine which logo to use
+  let logoSrc = '/fox-form-logo-text-black.png'
+  if (variant === 'white') {
+    logoSrc = '/logo-fox-form-text-white.png'
+  } else if (variant === 'auto' && mounted) {
+    // Use white logo in dark mode, black in light mode
+    logoSrc = theme === 'dark' 
+      ? '/logo-fox-form-text-white.png'
+      : '/fox-form-logo-text-black.png'
+  }
   
   const content = (
     <Image
