@@ -25,8 +25,8 @@ export default function RootLayout({
         className={`${inter.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {children}
-          <Toaster richColors position="top-center" />
+        {children}
+        <Toaster richColors position="top-center" />
         </ThemeProvider>
       </body>
     </html>

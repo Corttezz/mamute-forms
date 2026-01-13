@@ -107,7 +107,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
             </button>
           </div>
         </div>
-      </div>
+        </div>
 
       {/* Main content */}
       {activeTab === 'component' && (
@@ -620,7 +620,7 @@ export function QuestionEditor({ question, questions = [], onUpdate, onDelete }:
         <Trash2 className="w-4 h-4 mr-2" />
         Delete question
       </Button>
-        </div>
+          </div>
         </div>
       )}
 

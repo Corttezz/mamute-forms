@@ -179,6 +179,11 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const router = useRouter()
   const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const filteredForms = useMemo(() => {
     if (!searchQuery) return mockForms
@@ -188,10 +193,10 @@ export default function DashboardPage() {
   }, [searchQuery])
 
   return (
-    <div className="p-8">
+    <div className="w-full overflow-x-hidden">
       <div className="w-full">
         {/* Header */}
-        <div className="mb-6">
+        <div className="p-8 bg-card">
           <div className="flex items-start justify-between mb-2">
             <div>
               <h1 className="text-[24px] font-semibold text-foreground mb-1" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
@@ -211,7 +216,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-card border-t border-b border-border -mx-8 px-8 mb-6">
+        <div className="bg-card border-t border-b border-border px-8 mb-6">
           <div className="w-full py-4">
             <div className="flex items-center justify-between gap-3">
               <div className="w-[300px] relative">
@@ -260,7 +265,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="px-8 pb-8">
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
           {/* Forms Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -369,7 +375,7 @@ export default function DashboardPage() {
           {/* Help Section */}
           <div 
             className="px-6 py-6 border-t border-border"
-            style={theme === 'dark' ? { background: 'linear-gradient(90deg, #1F255C 0%, #40499A 100%)' } : { backgroundColor: 'var(--card)' }}
+            style={mounted && theme === 'dark' ? { background: 'linear-gradient(90deg, #1F255C 0%, #40499A 100%)' } : { backgroundColor: 'var(--card)' }}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -400,6 +406,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

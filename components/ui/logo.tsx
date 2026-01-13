@@ -28,8 +28,8 @@ export function Logo({ href = '/', size = 'md', className, variant = 'auto' }: L
   } else if (variant === 'auto' && mounted) {
     // Use white logo in dark mode, black in light mode
     logoSrc = theme === 'dark' 
-      ? '/logo-fox-form-text-white.png'
-      : '/fox-form-logo-text-black.png'
+    ? '/logo-fox-form-text-white.png'
+    : '/fox-form-logo-text-black.png'
   }
   
   const content = (
